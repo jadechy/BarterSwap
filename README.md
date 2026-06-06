@@ -32,5 +32,6 @@ docker compose exec db mysql -u go -ppassword barterswap -e "source /seeds.sql"
 
 ## Démarrage du serveur
 ```bash
+docker compose exec go go mod tidy
 docker compose exec go go run .
 ```
