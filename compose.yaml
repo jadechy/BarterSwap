@@ -1,0 +1,7 @@
+services:
+ go:
+  build: .
+  tty: true
+  stdin_open: true
+  volumes:
+    - .:/home/go
