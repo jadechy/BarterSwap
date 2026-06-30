@@ -11,4 +11,5 @@ var (
 	ErrAlreadyReviewed     = errors.New("vous avez déjà laissé un avis pour cet échange")
 	ErrInvalidStatus       = errors.New("transition de statut invalide")
 	ErrUnauthorized        = errors.New("action non autorisée")
+	ErrValidation 		   = errors.New("données invalides")
 )
