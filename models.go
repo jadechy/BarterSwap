@@ -2,7 +2,8 @@ package main
 
 type User struct{
 	ID int `json:"id"`
-	Pseudo string `json:"bio,omitempty"`
+	Pseudo string `json:"pseudo,omitempty"`
+	Bio string `json:"bio,omitempty"`
 	Ville string `json:"ville,omitempty"`
 	Skills []Skill `json:"skills,omitempty"`
 	CreditBalance int `json:"credit_balance"` // créditstemps disponibles
