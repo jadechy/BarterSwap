@@ -28,8 +28,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
-
+	defer func() {
+		if cerr := db.Close(); cerr != nil {
+			log.Printf("erreur fermeture DB: %v", cerr)
+		}
+	}()
 	txManager := dbx.NewTxManager(db)
 
 	userRepo := user.NewRepository(db)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 )
 
 type Repository interface {
@@ -33,7 +34,6 @@ func (r *sqlRepository) Create(ctx context.Context, rev *Review) error {
 	rev.ID = int(id)
 	return nil
 }
-
 func (r *sqlRepository) GetByUserID(ctx context.Context, userID int) ([]Review, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT id, exchange_id, author_id, target_id, note, commentaire, created_at
@@ -41,7 +41,11 @@ func (r *sqlRepository) GetByUserID(ctx context.Context, userID int) ([]Review, 
 	if err != nil {
 		return nil, fmt.Errorf("review.GetByUserID: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); cerr != nil {
+			log.Printf("review.GetByUserID: erreur fermeture rows: %v", cerr)
+		}
+	}()
 	return scanReviews(rows)
 }
 
@@ -54,7 +58,11 @@ func (r *sqlRepository) GetByServiceID(ctx context.Context, serviceID int) ([]Re
 	if err != nil {
 		return nil, fmt.Errorf("review.GetByServiceID: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); cerr != nil {
+			log.Printf("review.GetByServiceID: erreur fermeture rows: %v", cerr)
+		}
+	}()
 	return scanReviews(rows)
 }
 

@@ -23,6 +23,14 @@ func WriteJSON(w http.ResponseWriter, status int, data any) {
 // WriteError mappe une erreur de domaine (apperrors) vers le status HTTP approprié
 // et écrit une réponse JSON standardisée {"error": "..."}.
 func WriteError(w http.ResponseWriter, err error) {
+	if valErr, ok := errors.AsType[apperrors.ValidationError](err); ok {
+		WriteJSON(w, http.StatusBadRequest, map[string]string{
+			"error": valErr.Error(),
+			"champ": valErr.Champ,
+		})
+		return
+	}
+
 	switch {
 	case errors.Is(err, apperrors.ErrNotFound):
 		WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})

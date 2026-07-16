@@ -78,3 +78,18 @@ docker compose exec go go run .
 ### Authentification
 
 Toutes les routes (sauf `POST /api/users`) nécessitent le header `X-UserID` correspondant à l'ID de l'utilisateur effectuant la requête.
+
+### Linter
+
+- go vet
+- go fmt
+- go errcheck
+
+```
+docker compose exec go go build ./...
+docker compose exec go go vet ./...
+docker compose exec go errcheck ./...
+docker compose exec go gofmt -l .
+```
+
+Si les 4 commandes ne retournent absolument rien, alors le repo est valide sur la compilation, vet, les erreurs ignorées et le formatage.

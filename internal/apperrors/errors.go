@@ -1,6 +1,9 @@
 package apperrors
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	ErrNotFound            = errors.New("ressource introuvable")
@@ -13,3 +16,16 @@ var (
 	ErrUnauthorized        = errors.New("action non autorisée")
 	ErrValidation          = errors.New("données invalides")
 )
+
+type ValidationError struct {
+	Champ   string
+	Message string
+}
+
+func (e ValidationError) Error() string {
+	return fmt.Sprintf("validation échouée sur %s : %s", e.Champ, e.Message)
+}
+
+func (e ValidationError) Is(target error) bool {
+	return target == ErrValidation
+}

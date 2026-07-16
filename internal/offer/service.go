@@ -20,13 +20,17 @@ func NewService(repo Repository, userRepo user.Repository) *Service {
 
 func (s *Service) Create(ctx context.Context, o *Offer) error {
 	if strings.TrimSpace(o.Titre) == "" {
-		return fmt.Errorf("le titre est requis: %w", apperrors.ErrValidation)
+		return apperrors.ValidationError{Champ: "titre", Message: "le titre est requis"}
 	}
 	if !contains(CategoriesValides, o.Categorie) {
-		return fmt.Errorf("catégorie invalide %q: %w", o.Categorie, apperrors.ErrValidation)
+		return apperrors.ValidationError{Champ: "categorie", Message: fmt.Sprintf("catégorie invalide %q", o.Categorie)}
 	}
 	if o.Credits <= 0 {
-		return fmt.Errorf("le coût en crédits doit être positif: %w", apperrors.ErrValidation)
+		return apperrors.ValidationError{
+			Champ:   "credits",
+			Message: fmt.Sprintf("le coût en crédits doit être positif, reçu : %d", o.Credits),
+		}
+
 	}
 
 	skills, err := s.userRepo.GetSkills(ctx, o.ProviderID)
@@ -41,7 +45,10 @@ func (s *Service) Create(ctx context.Context, o *Offer) error {
 		}
 	}
 	if !hasSkill {
-		return fmt.Errorf("vous n'avez pas la compétence %q: %w", o.Categorie, apperrors.ErrValidation)
+		return apperrors.ValidationError{
+			Champ:   "categorie",
+			Message: fmt.Sprintf("vous n'avez pas la compétence %q", o.Categorie),
+		}
 	}
 
 	return s.repo.Create(ctx, o)
@@ -57,7 +64,10 @@ func (s *Service) List(ctx context.Context, f ListFilter) ([]Offer, error) {
 
 func (s *Service) Update(ctx context.Context, id int, o *Offer) error {
 	if !contains(CategoriesValides, o.Categorie) {
-		return fmt.Errorf("catégorie invalide %q: %w", o.Categorie, apperrors.ErrValidation)
+		return apperrors.ValidationError{
+			Champ:   "categorie",
+			Message: fmt.Sprintf("catégorie invalide %q", o.Categorie),
+		}
 	}
 	return s.repo.Update(ctx, id, o)
 }
