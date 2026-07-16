@@ -1,0 +1,463 @@
+basePath: /api
+definitions:
+  exchange.Exchange:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      owner_id:
+        type: integer
+      requester_id:
+        type: integer
+      service_id:
+        type: integer
+      status:
+        description: pending, accepted, rejected, cancelled, completed
+        type: string
+      updated_at:
+        type: string
+    type: object
+  offer.Offer:
+    properties:
+      actif:
+        type: boolean
+      categorie:
+        type: string
+      created_at:
+        type: string
+      credits:
+        type: integer
+      description:
+        type: string
+      duree_minutes:
+        type: integer
+      id:
+        type: integer
+      provider_id:
+        type: integer
+      titre:
+        type: string
+      ville:
+        type: string
+    type: object
+  review.Review:
+    properties:
+      author_id:
+        type: integer
+      commentaire:
+        type: string
+      created_at:
+        type: string
+      exchange_id:
+        type: integer
+      id:
+        type: integer
+      note:
+        description: 1-5
+        type: integer
+      target_id:
+        type: integer
+    type: object
+  user.Skill:
+    properties:
+      niveau:
+        description: '"débutant", "intermédiaire", "expert"'
+        type: string
+      nom:
+        type: string
+    type: object
+  user.Stats:
+    properties:
+      credit_balance:
+        type: integer
+      echanges_completes:
+        type: integer
+      nb_avis:
+        type: integer
+      note_moyenne:
+        type: number
+      services_actifs:
+        type: integer
+      total_depense:
+        type: integer
+      total_gagne:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  user.User:
+    properties:
+      bio:
+        type: string
+      created_at:
+        type: string
+      credit_balance:
+        type: integer
+      id:
+        type: integer
+      pseudo:
+        type: string
+      skills:
+        items:
+          $ref: '#/definitions/user.Skill'
+        type: array
+      ville:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API de troc de services entre particuliers, basé sur des crédits-temps.
+  title: Armali Troc API
+  version: "1.0"
+paths:
+  /exchanges:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: service_id
+        in: body
+        name: exchange
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/exchange.Exchange'
+      security:
+      - UserIDAuth: []
+      summary: Créer une demande d'échange
+      tags:
+      - exchanges
+  /exchanges/{id}/accept:
+    put:
+      parameters:
+      - description: ID échange
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Accepter un échange
+      tags:
+      - exchanges
+  /exchanges/{id}/review:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID de l'échange
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Note et commentaire
+        in: body
+        name: review
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/review.Review'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Laisser un avis sur un échange terminé
+      tags:
+      - reviews
+  /services:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Offre à créer
+        in: body
+        name: offer
+        required: true
+        schema:
+          $ref: '#/definitions/offer.Offer'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/offer.Offer'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Créer une offre de service
+      tags:
+      - offers
+  /services/{id}:
+    get:
+      parameters:
+      - description: ID de l'offre
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/offer.Offer'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Récupérer une offre par ID
+      tags:
+      - offers
+  /services/{id}/reviews:
+    get:
+      parameters:
+      - description: ID de l'offre
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/review.Review'
+            type: array
+      security:
+      - UserIDAuth: []
+      summary: Avis reçus sur une offre
+      tags:
+      - reviews
+  /users:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Utilisateur à créer
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Créer un utilisateur
+      tags:
+      - users
+  /users/{id}:
+    get:
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.User'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Récupérer un utilisateur par ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Données à mettre à jour
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Mettre à jour un utilisateur
+      tags:
+      - users
+  /users/{id}/reviews:
+    get:
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/review.Review'
+            type: array
+      security:
+      - UserIDAuth: []
+      summary: Avis reçus par un utilisateur
+      tags:
+      - reviews
+  /users/{id}/skills:
+    get:
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/user.Skill'
+            type: array
+      security:
+      - UserIDAuth: []
+      summary: Lister les compétences d'un utilisateur
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Nouvelle liste de compétences
+        in: body
+        name: skills
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/user.Skill'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/user.Skill'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Remplacer les compétences d'un utilisateur
+      tags:
+      - users
+  /users/{id}/stats:
+    get:
+      parameters:
+      - description: ID utilisateur
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.Stats'
+      security:
+      - UserIDAuth: []
+      summary: Statistiques d'un utilisateur
+      tags:
+      - users
+securityDefinitions:
+  UserIDAuth:
+    in: header
+    name: X-UserID
+    type: apiKey
+swagger: "2.0"
