@@ -2,12 +2,13 @@
 // github.com/vektra/mockery
 // template: testify
 
-package user
+package usermocks
 
 import (
 	"context"
 
 	"github.com/jadechy/barterswap/internal/dbx"
+	"github.com/jadechy/barterswap/internal/user"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -120,7 +121,7 @@ func (_c *MockRepository_AddCreditTransaction_Call) RunAndReturn(run func(ctx co
 }
 
 // Create provides a mock function for the type MockRepository
-func (_mock *MockRepository) Create(ctx context.Context, u *User) error {
+func (_mock *MockRepository) Create(ctx context.Context, u *user.User) error {
 	ret := _mock.Called(ctx, u)
 
 	if len(ret) == 0 {
@@ -128,7 +129,7 @@ func (_mock *MockRepository) Create(ctx context.Context, u *User) error {
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *User) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *user.User) error); ok {
 		r0 = returnFunc(ctx, u)
 	} else {
 		r0 = ret.Error(0)
@@ -143,20 +144,20 @@ type MockRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - u *User
+//   - u *user.User
 func (_e *MockRepository_Expecter) Create(ctx any, u any) *MockRepository_Create_Call {
 	return &MockRepository_Create_Call{Call: _e.mock.On("Create", ctx, u)}
 }
 
-func (_c *MockRepository_Create_Call) Run(run func(ctx context.Context, u *User)) *MockRepository_Create_Call {
+func (_c *MockRepository_Create_Call) Run(run func(ctx context.Context, u *user.User)) *MockRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *User
+		var arg1 *user.User
 		if args[1] != nil {
-			arg1 = args[1].(*User)
+			arg1 = args[1].(*user.User)
 		}
 		run(
 			arg0,
@@ -171,28 +172,28 @@ func (_c *MockRepository_Create_Call) Return(err error) *MockRepository_Create_C
 	return _c
 }
 
-func (_c *MockRepository_Create_Call) RunAndReturn(run func(ctx context.Context, u *User) error) *MockRepository_Create_Call {
+func (_c *MockRepository_Create_Call) RunAndReturn(run func(ctx context.Context, u *user.User) error) *MockRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetByID provides a mock function for the type MockRepository
-func (_mock *MockRepository) GetByID(ctx context.Context, id int) (User, error) {
+func (_mock *MockRepository) GetByID(ctx context.Context, id int) (user.User, error) {
 	ret := _mock.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByID")
 	}
 
-	var r0 User
+	var r0 user.User
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (User, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (user.User, error)); ok {
 		return returnFunc(ctx, id)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) User); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) user.User); ok {
 		r0 = returnFunc(ctx, id)
 	} else {
-		r0 = ret.Get(0).(User)
+		r0 = ret.Get(0).(user.User)
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
 		r1 = returnFunc(ctx, id)
@@ -232,34 +233,34 @@ func (_c *MockRepository_GetByID_Call) Run(run func(ctx context.Context, id int)
 	return _c
 }
 
-func (_c *MockRepository_GetByID_Call) Return(user User, err error) *MockRepository_GetByID_Call {
-	_c.Call.Return(user, err)
+func (_c *MockRepository_GetByID_Call) Return(user1 user.User, err error) *MockRepository_GetByID_Call {
+	_c.Call.Return(user1, err)
 	return _c
 }
 
-func (_c *MockRepository_GetByID_Call) RunAndReturn(run func(ctx context.Context, id int) (User, error)) *MockRepository_GetByID_Call {
+func (_c *MockRepository_GetByID_Call) RunAndReturn(run func(ctx context.Context, id int) (user.User, error)) *MockRepository_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetSkills provides a mock function for the type MockRepository
-func (_mock *MockRepository) GetSkills(ctx context.Context, userID int) ([]Skill, error) {
+func (_mock *MockRepository) GetSkills(ctx context.Context, userID int) ([]user.Skill, error) {
 	ret := _mock.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetSkills")
 	}
 
-	var r0 []Skill
+	var r0 []user.Skill
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]Skill, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]user.Skill, error)); ok {
 		return returnFunc(ctx, userID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []Skill); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []user.Skill); ok {
 		r0 = returnFunc(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]Skill)
+			r0 = ret.Get(0).([]user.Skill)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
@@ -300,18 +301,18 @@ func (_c *MockRepository_GetSkills_Call) Run(run func(ctx context.Context, userI
 	return _c
 }
 
-func (_c *MockRepository_GetSkills_Call) Return(skills []Skill, err error) *MockRepository_GetSkills_Call {
+func (_c *MockRepository_GetSkills_Call) Return(skills []user.Skill, err error) *MockRepository_GetSkills_Call {
 	_c.Call.Return(skills, err)
 	return _c
 }
 
-func (_c *MockRepository_GetSkills_Call) RunAndReturn(run func(ctx context.Context, userID int) ([]Skill, error)) *MockRepository_GetSkills_Call {
+func (_c *MockRepository_GetSkills_Call) RunAndReturn(run func(ctx context.Context, userID int) ([]user.Skill, error)) *MockRepository_GetSkills_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // SetSkills provides a mock function for the type MockRepository
-func (_mock *MockRepository) SetSkills(ctx context.Context, userID int, skills []Skill) error {
+func (_mock *MockRepository) SetSkills(ctx context.Context, userID int, skills []user.Skill) error {
 	ret := _mock.Called(ctx, userID, skills)
 
 	if len(ret) == 0 {
@@ -319,7 +320,7 @@ func (_mock *MockRepository) SetSkills(ctx context.Context, userID int, skills [
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int, []Skill) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int, []user.Skill) error); ok {
 		r0 = returnFunc(ctx, userID, skills)
 	} else {
 		r0 = ret.Error(0)
@@ -335,12 +336,12 @@ type MockRepository_SetSkills_Call struct {
 // SetSkills is a helper method to define mock.On call
 //   - ctx context.Context
 //   - userID int
-//   - skills []Skill
+//   - skills []user.Skill
 func (_e *MockRepository_Expecter) SetSkills(ctx any, userID any, skills any) *MockRepository_SetSkills_Call {
 	return &MockRepository_SetSkills_Call{Call: _e.mock.On("SetSkills", ctx, userID, skills)}
 }
 
-func (_c *MockRepository_SetSkills_Call) Run(run func(ctx context.Context, userID int, skills []Skill)) *MockRepository_SetSkills_Call {
+func (_c *MockRepository_SetSkills_Call) Run(run func(ctx context.Context, userID int, skills []user.Skill)) *MockRepository_SetSkills_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -350,9 +351,9 @@ func (_c *MockRepository_SetSkills_Call) Run(run func(ctx context.Context, userI
 		if args[1] != nil {
 			arg1 = args[1].(int)
 		}
-		var arg2 []Skill
+		var arg2 []user.Skill
 		if args[2] != nil {
-			arg2 = args[2].([]Skill)
+			arg2 = args[2].([]user.Skill)
 		}
 		run(
 			arg0,
@@ -368,28 +369,28 @@ func (_c *MockRepository_SetSkills_Call) Return(err error) *MockRepository_SetSk
 	return _c
 }
 
-func (_c *MockRepository_SetSkills_Call) RunAndReturn(run func(ctx context.Context, userID int, skills []Skill) error) *MockRepository_SetSkills_Call {
+func (_c *MockRepository_SetSkills_Call) RunAndReturn(run func(ctx context.Context, userID int, skills []user.Skill) error) *MockRepository_SetSkills_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Stats provides a mock function for the type MockRepository
-func (_mock *MockRepository) Stats(ctx context.Context, userID int) (Stats, error) {
+func (_mock *MockRepository) Stats(ctx context.Context, userID int) (user.Stats, error) {
 	ret := _mock.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Stats")
 	}
 
-	var r0 Stats
+	var r0 user.Stats
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (Stats, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (user.Stats, error)); ok {
 		return returnFunc(ctx, userID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) Stats); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) user.Stats); ok {
 		r0 = returnFunc(ctx, userID)
 	} else {
-		r0 = ret.Get(0).(Stats)
+		r0 = ret.Get(0).(user.Stats)
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
 		r1 = returnFunc(ctx, userID)
@@ -429,18 +430,18 @@ func (_c *MockRepository_Stats_Call) Run(run func(ctx context.Context, userID in
 	return _c
 }
 
-func (_c *MockRepository_Stats_Call) Return(stats Stats, err error) *MockRepository_Stats_Call {
+func (_c *MockRepository_Stats_Call) Return(stats user.Stats, err error) *MockRepository_Stats_Call {
 	_c.Call.Return(stats, err)
 	return _c
 }
 
-func (_c *MockRepository_Stats_Call) RunAndReturn(run func(ctx context.Context, userID int) (Stats, error)) *MockRepository_Stats_Call {
+func (_c *MockRepository_Stats_Call) RunAndReturn(run func(ctx context.Context, userID int) (user.Stats, error)) *MockRepository_Stats_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Update provides a mock function for the type MockRepository
-func (_mock *MockRepository) Update(ctx context.Context, id int, u *User) error {
+func (_mock *MockRepository) Update(ctx context.Context, id int, u *user.User) error {
 	ret := _mock.Called(ctx, id, u)
 
 	if len(ret) == 0 {
@@ -448,7 +449,7 @@ func (_mock *MockRepository) Update(ctx context.Context, id int, u *User) error 
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int, *User) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int, *user.User) error); ok {
 		r0 = returnFunc(ctx, id, u)
 	} else {
 		r0 = ret.Error(0)
@@ -464,12 +465,12 @@ type MockRepository_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id int
-//   - u *User
+//   - u *user.User
 func (_e *MockRepository_Expecter) Update(ctx any, id any, u any) *MockRepository_Update_Call {
 	return &MockRepository_Update_Call{Call: _e.mock.On("Update", ctx, id, u)}
 }
 
-func (_c *MockRepository_Update_Call) Run(run func(ctx context.Context, id int, u *User)) *MockRepository_Update_Call {
+func (_c *MockRepository_Update_Call) Run(run func(ctx context.Context, id int, u *user.User)) *MockRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -479,9 +480,9 @@ func (_c *MockRepository_Update_Call) Run(run func(ctx context.Context, id int, 
 		if args[1] != nil {
 			arg1 = args[1].(int)
 		}
-		var arg2 *User
+		var arg2 *user.User
 		if args[2] != nil {
-			arg2 = args[2].(*User)
+			arg2 = args[2].(*user.User)
 		}
 		run(
 			arg0,
@@ -497,7 +498,7 @@ func (_c *MockRepository_Update_Call) Return(err error) *MockRepository_Update_C
 	return _c
 }
 
-func (_c *MockRepository_Update_Call) RunAndReturn(run func(ctx context.Context, id int, u *User) error) *MockRepository_Update_Call {
+func (_c *MockRepository_Update_Call) RunAndReturn(run func(ctx context.Context, id int, u *user.User) error) *MockRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

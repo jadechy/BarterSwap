@@ -1,4 +1,4 @@
-package exchange
+package exchange_test
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"github.com/jadechy/barterswap/internal/apperrors"
 	"github.com/jadechy/barterswap/internal/dbx"
 	dbxmocks "github.com/jadechy/barterswap/internal/dbx/mocks"
+	"github.com/jadechy/barterswap/internal/exchange"
 	exchangemocks "github.com/jadechy/barterswap/internal/exchange/mocks"
 	"github.com/jadechy/barterswap/internal/offer"
 	offermocks "github.com/jadechy/barterswap/internal/offer/mocks"
@@ -23,7 +24,7 @@ func TestCreate_SoiMeme_RetourneErreurSelfExchange(t *testing.T) {
 	tx := dbxmocks.NewMockTxRunner(t)
 	offers := offermocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
-	svc := NewService(repo, tx, offers, users, users)
+	svc := exchange.NewService(repo, tx, offers, users, users)
 
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
@@ -40,7 +41,7 @@ func TestCreate_EchangeActifExistant_RetourneErreurConflict(t *testing.T) {
 	tx := dbxmocks.NewMockTxRunner(t)
 	offers := offermocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
-	svc := NewService(repo, tx, offers, users, users)
+	svc := exchange.NewService(repo, tx, offers, users, users)
 
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
@@ -60,7 +61,7 @@ func TestCreate_SoldeInsuffisant_RetourneErreur(t *testing.T) {
 	tx := dbxmocks.NewMockTxRunner(t)
 	offers := offermocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
-	svc := NewService(repo, tx, offers, users, users)
+	svc := exchange.NewService(repo, tx, offers, users, users)
 
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
@@ -83,7 +84,7 @@ func TestCreate_Valide_Succes(t *testing.T) {
 	tx := dbxmocks.NewMockTxRunner(t)
 	offers := offermocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
-	svc := NewService(repo, tx, offers, users, users)
+	svc := exchange.NewService(repo, tx, offers, users, users)
 
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
@@ -110,11 +111,11 @@ func TestAccept_NonProprietaire_RetourneErreurUnauthorized(t *testing.T) {
 	tx := dbxmocks.NewMockTxRunner(t)
 	offers := offermocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
-	svc := NewService(repo, tx, offers, users, users)
+	svc := exchange.NewService(repo, tx, offers, users, users)
 
 	repo.EXPECT().
 		GetByID(mock.Anything, 1).
-		Return(Exchange{ID: 1, OwnerID: 2, Status: "pending"}, nil)
+		Return(exchange.Exchange{ID: 1, OwnerID: 2, Status: "pending"}, nil)
 
 	err := svc.Accept(context.Background(), 1, 99)
 
@@ -127,11 +128,11 @@ func TestAccept_StatutInvalide_RetourneErreur(t *testing.T) {
 	tx := dbxmocks.NewMockTxRunner(t)
 	offers := offermocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
-	svc := NewService(repo, tx, offers, users, users)
+	svc := exchange.NewService(repo, tx, offers, users, users)
 
 	repo.EXPECT().
 		GetByID(mock.Anything, 1).
-		Return(Exchange{ID: 1, OwnerID: 2, Status: "completed"}, nil)
+		Return(exchange.Exchange{ID: 1, OwnerID: 2, Status: "completed"}, nil)
 
 	err := svc.Accept(context.Background(), 1, 2)
 
@@ -144,11 +145,11 @@ func TestAccept_Valide_Succes(t *testing.T) {
 	tx := dbxmocks.NewMockTxRunner(t)
 	offers := offermocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
-	svc := NewService(repo, tx, offers, users, users)
+	svc := exchange.NewService(repo, tx, offers, users, users)
 
 	repo.EXPECT().
 		GetByID(mock.Anything, 1).
-		Return(Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "pending"}, nil)
+		Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "pending"}, nil)
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
 		Return(offer.Offer{ID: 10, Credits: 5}, nil)

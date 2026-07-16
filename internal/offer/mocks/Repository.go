@@ -2,11 +2,12 @@
 // github.com/vektra/mockery
 // template: testify
 
-package offer
+package offermocks
 
 import (
 	"context"
 
+	"github.com/jadechy/barterswap/internal/offer"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -38,7 +39,7 @@ func (_m *MockRepository) EXPECT() *MockRepository_Expecter {
 }
 
 // Create provides a mock function for the type MockRepository
-func (_mock *MockRepository) Create(ctx context.Context, o *Offer) error {
+func (_mock *MockRepository) Create(ctx context.Context, o *offer.Offer) error {
 	ret := _mock.Called(ctx, o)
 
 	if len(ret) == 0 {
@@ -46,7 +47,7 @@ func (_mock *MockRepository) Create(ctx context.Context, o *Offer) error {
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *Offer) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *offer.Offer) error); ok {
 		r0 = returnFunc(ctx, o)
 	} else {
 		r0 = ret.Error(0)
@@ -61,20 +62,20 @@ type MockRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - o *Offer
+//   - o *offer.Offer
 func (_e *MockRepository_Expecter) Create(ctx any, o any) *MockRepository_Create_Call {
 	return &MockRepository_Create_Call{Call: _e.mock.On("Create", ctx, o)}
 }
 
-func (_c *MockRepository_Create_Call) Run(run func(ctx context.Context, o *Offer)) *MockRepository_Create_Call {
+func (_c *MockRepository_Create_Call) Run(run func(ctx context.Context, o *offer.Offer)) *MockRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *Offer
+		var arg1 *offer.Offer
 		if args[1] != nil {
-			arg1 = args[1].(*Offer)
+			arg1 = args[1].(*offer.Offer)
 		}
 		run(
 			arg0,
@@ -89,7 +90,7 @@ func (_c *MockRepository_Create_Call) Return(err error) *MockRepository_Create_C
 	return _c
 }
 
-func (_c *MockRepository_Create_Call) RunAndReturn(run func(ctx context.Context, o *Offer) error) *MockRepository_Create_Call {
+func (_c *MockRepository_Create_Call) RunAndReturn(run func(ctx context.Context, o *offer.Offer) error) *MockRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -152,22 +153,22 @@ func (_c *MockRepository_Delete_Call) RunAndReturn(run func(ctx context.Context,
 }
 
 // GetByID provides a mock function for the type MockRepository
-func (_mock *MockRepository) GetByID(ctx context.Context, id int) (Offer, error) {
+func (_mock *MockRepository) GetByID(ctx context.Context, id int) (offer.Offer, error) {
 	ret := _mock.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByID")
 	}
 
-	var r0 Offer
+	var r0 offer.Offer
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (Offer, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (offer.Offer, error)); ok {
 		return returnFunc(ctx, id)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) Offer); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) offer.Offer); ok {
 		r0 = returnFunc(ctx, id)
 	} else {
-		r0 = ret.Get(0).(Offer)
+		r0 = ret.Get(0).(offer.Offer)
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
 		r1 = returnFunc(ctx, id)
@@ -207,37 +208,37 @@ func (_c *MockRepository_GetByID_Call) Run(run func(ctx context.Context, id int)
 	return _c
 }
 
-func (_c *MockRepository_GetByID_Call) Return(offer Offer, err error) *MockRepository_GetByID_Call {
-	_c.Call.Return(offer, err)
+func (_c *MockRepository_GetByID_Call) Return(offer1 offer.Offer, err error) *MockRepository_GetByID_Call {
+	_c.Call.Return(offer1, err)
 	return _c
 }
 
-func (_c *MockRepository_GetByID_Call) RunAndReturn(run func(ctx context.Context, id int) (Offer, error)) *MockRepository_GetByID_Call {
+func (_c *MockRepository_GetByID_Call) RunAndReturn(run func(ctx context.Context, id int) (offer.Offer, error)) *MockRepository_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // List provides a mock function for the type MockRepository
-func (_mock *MockRepository) List(ctx context.Context, f ListFilter) ([]Offer, error) {
+func (_mock *MockRepository) List(ctx context.Context, f offer.ListFilter) ([]offer.Offer, error) {
 	ret := _mock.Called(ctx, f)
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
 	}
 
-	var r0 []Offer
+	var r0 []offer.Offer
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, ListFilter) ([]Offer, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, offer.ListFilter) ([]offer.Offer, error)); ok {
 		return returnFunc(ctx, f)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, ListFilter) []Offer); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, offer.ListFilter) []offer.Offer); ok {
 		r0 = returnFunc(ctx, f)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]Offer)
+			r0 = ret.Get(0).([]offer.Offer)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, ListFilter) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, offer.ListFilter) error); ok {
 		r1 = returnFunc(ctx, f)
 	} else {
 		r1 = ret.Error(1)
@@ -252,20 +253,20 @@ type MockRepository_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - ctx context.Context
-//   - f ListFilter
+//   - f offer.ListFilter
 func (_e *MockRepository_Expecter) List(ctx any, f any) *MockRepository_List_Call {
 	return &MockRepository_List_Call{Call: _e.mock.On("List", ctx, f)}
 }
 
-func (_c *MockRepository_List_Call) Run(run func(ctx context.Context, f ListFilter)) *MockRepository_List_Call {
+func (_c *MockRepository_List_Call) Run(run func(ctx context.Context, f offer.ListFilter)) *MockRepository_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 ListFilter
+		var arg1 offer.ListFilter
 		if args[1] != nil {
-			arg1 = args[1].(ListFilter)
+			arg1 = args[1].(offer.ListFilter)
 		}
 		run(
 			arg0,
@@ -275,18 +276,18 @@ func (_c *MockRepository_List_Call) Run(run func(ctx context.Context, f ListFilt
 	return _c
 }
 
-func (_c *MockRepository_List_Call) Return(offers []Offer, err error) *MockRepository_List_Call {
+func (_c *MockRepository_List_Call) Return(offers []offer.Offer, err error) *MockRepository_List_Call {
 	_c.Call.Return(offers, err)
 	return _c
 }
 
-func (_c *MockRepository_List_Call) RunAndReturn(run func(ctx context.Context, f ListFilter) ([]Offer, error)) *MockRepository_List_Call {
+func (_c *MockRepository_List_Call) RunAndReturn(run func(ctx context.Context, f offer.ListFilter) ([]offer.Offer, error)) *MockRepository_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Update provides a mock function for the type MockRepository
-func (_mock *MockRepository) Update(ctx context.Context, id int, o *Offer) error {
+func (_mock *MockRepository) Update(ctx context.Context, id int, o *offer.Offer) error {
 	ret := _mock.Called(ctx, id, o)
 
 	if len(ret) == 0 {
@@ -294,7 +295,7 @@ func (_mock *MockRepository) Update(ctx context.Context, id int, o *Offer) error
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int, *Offer) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int, *offer.Offer) error); ok {
 		r0 = returnFunc(ctx, id, o)
 	} else {
 		r0 = ret.Error(0)
@@ -310,12 +311,12 @@ type MockRepository_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id int
-//   - o *Offer
+//   - o *offer.Offer
 func (_e *MockRepository_Expecter) Update(ctx any, id any, o any) *MockRepository_Update_Call {
 	return &MockRepository_Update_Call{Call: _e.mock.On("Update", ctx, id, o)}
 }
 
-func (_c *MockRepository_Update_Call) Run(run func(ctx context.Context, id int, o *Offer)) *MockRepository_Update_Call {
+func (_c *MockRepository_Update_Call) Run(run func(ctx context.Context, id int, o *offer.Offer)) *MockRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -325,9 +326,9 @@ func (_c *MockRepository_Update_Call) Run(run func(ctx context.Context, id int, 
 		if args[1] != nil {
 			arg1 = args[1].(int)
 		}
-		var arg2 *Offer
+		var arg2 *offer.Offer
 		if args[2] != nil {
-			arg2 = args[2].(*Offer)
+			arg2 = args[2].(*offer.Offer)
 		}
 		run(
 			arg0,
@@ -343,7 +344,7 @@ func (_c *MockRepository_Update_Call) Return(err error) *MockRepository_Update_C
 	return _c
 }
 
-func (_c *MockRepository_Update_Call) RunAndReturn(run func(ctx context.Context, id int, o *Offer) error) *MockRepository_Update_Call {
+func (_c *MockRepository_Update_Call) RunAndReturn(run func(ctx context.Context, id int, o *offer.Offer) error) *MockRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

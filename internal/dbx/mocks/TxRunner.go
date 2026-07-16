@@ -2,11 +2,12 @@
 // github.com/vektra/mockery
 // template: testify
 
-package dbx
+package dbxmocks
 
 import (
 	"context"
 
+	"github.com/jadechy/barterswap/internal/dbx"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -38,7 +39,7 @@ func (_m *MockTxRunner) EXPECT() *MockTxRunner_Expecter {
 }
 
 // WithTx provides a mock function for the type MockTxRunner
-func (_mock *MockTxRunner) WithTx(ctx context.Context, fn func(q Querier) error) error {
+func (_mock *MockTxRunner) WithTx(ctx context.Context, fn func(q dbx.Querier) error) error {
 	ret := _mock.Called(ctx, fn)
 
 	if len(ret) == 0 {
@@ -46,7 +47,7 @@ func (_mock *MockTxRunner) WithTx(ctx context.Context, fn func(q Querier) error)
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, func(q Querier) error) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, func(q dbx.Querier) error) error); ok {
 		r0 = returnFunc(ctx, fn)
 	} else {
 		r0 = ret.Error(0)
@@ -61,20 +62,20 @@ type MockTxRunner_WithTx_Call struct {
 
 // WithTx is a helper method to define mock.On call
 //   - ctx context.Context
-//   - fn func(q Querier) error
+//   - fn func(q dbx.Querier) error
 func (_e *MockTxRunner_Expecter) WithTx(ctx any, fn any) *MockTxRunner_WithTx_Call {
 	return &MockTxRunner_WithTx_Call{Call: _e.mock.On("WithTx", ctx, fn)}
 }
 
-func (_c *MockTxRunner_WithTx_Call) Run(run func(ctx context.Context, fn func(q Querier) error)) *MockTxRunner_WithTx_Call {
+func (_c *MockTxRunner_WithTx_Call) Run(run func(ctx context.Context, fn func(q dbx.Querier) error)) *MockTxRunner_WithTx_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 func(q Querier) error
+		var arg1 func(q dbx.Querier) error
 		if args[1] != nil {
-			arg1 = args[1].(func(q Querier) error)
+			arg1 = args[1].(func(q dbx.Querier) error)
 		}
 		run(
 			arg0,
@@ -89,7 +90,7 @@ func (_c *MockTxRunner_WithTx_Call) Return(err error) *MockTxRunner_WithTx_Call 
 	return _c
 }
 
-func (_c *MockTxRunner_WithTx_Call) RunAndReturn(run func(ctx context.Context, fn func(q Querier) error) error) *MockTxRunner_WithTx_Call {
+func (_c *MockTxRunner_WithTx_Call) RunAndReturn(run func(ctx context.Context, fn func(q dbx.Querier) error) error) *MockTxRunner_WithTx_Call {
 	_c.Call.Return(run)
 	return _c
 }

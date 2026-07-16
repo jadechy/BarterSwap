@@ -2,12 +2,12 @@
 // github.com/vektra/mockery
 // template: testify
 
-package review
+package reviewmocks
 
 import (
 	"context"
 
-	"github.com/jadechy/barterswap/internal/exchange"
+	"github.com/jadechy/barterswap/internal/review"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -39,7 +39,7 @@ func (_m *MockRepository) EXPECT() *MockRepository_Expecter {
 }
 
 // Create provides a mock function for the type MockRepository
-func (_mock *MockRepository) Create(ctx context.Context, r *Review) error {
+func (_mock *MockRepository) Create(ctx context.Context, r *review.Review) error {
 	ret := _mock.Called(ctx, r)
 
 	if len(ret) == 0 {
@@ -47,7 +47,7 @@ func (_mock *MockRepository) Create(ctx context.Context, r *Review) error {
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *Review) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *review.Review) error); ok {
 		r0 = returnFunc(ctx, r)
 	} else {
 		r0 = ret.Error(0)
@@ -62,20 +62,20 @@ type MockRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - r *Review
+//   - r *review.Review
 func (_e *MockRepository_Expecter) Create(ctx any, r any) *MockRepository_Create_Call {
 	return &MockRepository_Create_Call{Call: _e.mock.On("Create", ctx, r)}
 }
 
-func (_c *MockRepository_Create_Call) Run(run func(ctx context.Context, r *Review)) *MockRepository_Create_Call {
+func (_c *MockRepository_Create_Call) Run(run func(ctx context.Context, r *review.Review)) *MockRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *Review
+		var arg1 *review.Review
 		if args[1] != nil {
-			arg1 = args[1].(*Review)
+			arg1 = args[1].(*review.Review)
 		}
 		run(
 			arg0,
@@ -90,29 +90,29 @@ func (_c *MockRepository_Create_Call) Return(err error) *MockRepository_Create_C
 	return _c
 }
 
-func (_c *MockRepository_Create_Call) RunAndReturn(run func(ctx context.Context, r *Review) error) *MockRepository_Create_Call {
+func (_c *MockRepository_Create_Call) RunAndReturn(run func(ctx context.Context, r *review.Review) error) *MockRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetByServiceID provides a mock function for the type MockRepository
-func (_mock *MockRepository) GetByServiceID(ctx context.Context, serviceID int) ([]Review, error) {
+func (_mock *MockRepository) GetByServiceID(ctx context.Context, serviceID int) ([]review.Review, error) {
 	ret := _mock.Called(ctx, serviceID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByServiceID")
 	}
 
-	var r0 []Review
+	var r0 []review.Review
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]Review, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]review.Review, error)); ok {
 		return returnFunc(ctx, serviceID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []Review); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []review.Review); ok {
 		r0 = returnFunc(ctx, serviceID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]Review)
+			r0 = ret.Get(0).([]review.Review)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
@@ -153,34 +153,34 @@ func (_c *MockRepository_GetByServiceID_Call) Run(run func(ctx context.Context, 
 	return _c
 }
 
-func (_c *MockRepository_GetByServiceID_Call) Return(reviews []Review, err error) *MockRepository_GetByServiceID_Call {
+func (_c *MockRepository_GetByServiceID_Call) Return(reviews []review.Review, err error) *MockRepository_GetByServiceID_Call {
 	_c.Call.Return(reviews, err)
 	return _c
 }
 
-func (_c *MockRepository_GetByServiceID_Call) RunAndReturn(run func(ctx context.Context, serviceID int) ([]Review, error)) *MockRepository_GetByServiceID_Call {
+func (_c *MockRepository_GetByServiceID_Call) RunAndReturn(run func(ctx context.Context, serviceID int) ([]review.Review, error)) *MockRepository_GetByServiceID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetByUserID provides a mock function for the type MockRepository
-func (_mock *MockRepository) GetByUserID(ctx context.Context, userID int) ([]Review, error) {
+func (_mock *MockRepository) GetByUserID(ctx context.Context, userID int) ([]review.Review, error) {
 	ret := _mock.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByUserID")
 	}
 
-	var r0 []Review
+	var r0 []review.Review
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]Review, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]review.Review, error)); ok {
 		return returnFunc(ctx, userID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []Review); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []review.Review); ok {
 		r0 = returnFunc(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]Review)
+			r0 = ret.Get(0).([]review.Review)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
@@ -221,12 +221,12 @@ func (_c *MockRepository_GetByUserID_Call) Run(run func(ctx context.Context, use
 	return _c
 }
 
-func (_c *MockRepository_GetByUserID_Call) Return(reviews []Review, err error) *MockRepository_GetByUserID_Call {
+func (_c *MockRepository_GetByUserID_Call) Return(reviews []review.Review, err error) *MockRepository_GetByUserID_Call {
 	_c.Call.Return(reviews, err)
 	return _c
 }
 
-func (_c *MockRepository_GetByUserID_Call) RunAndReturn(run func(ctx context.Context, userID int) ([]Review, error)) *MockRepository_GetByUserID_Call {
+func (_c *MockRepository_GetByUserID_Call) RunAndReturn(run func(ctx context.Context, userID int) ([]review.Review, error)) *MockRepository_GetByUserID_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -299,99 +299,6 @@ func (_c *MockRepository_HasReviewed_Call) Return(b bool, err error) *MockReposi
 }
 
 func (_c *MockRepository_HasReviewed_Call) RunAndReturn(run func(ctx context.Context, exchangeID int, authorID int) (bool, error)) *MockRepository_HasReviewed_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// NewMockExchangeGetter creates a new instance of MockExchangeGetter. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
-// The first argument is typically a *testing.T value.
-func NewMockExchangeGetter(t interface {
-	mock.TestingT
-	Cleanup(func())
-}) *MockExchangeGetter {
-	mock := &MockExchangeGetter{}
-	mock.Mock.Test(t)
-
-	t.Cleanup(func() { mock.AssertExpectations(t) })
-
-	return mock
-}
-
-// MockExchangeGetter is an autogenerated mock type for the ExchangeGetter type
-type MockExchangeGetter struct {
-	mock.Mock
-}
-
-type MockExchangeGetter_Expecter struct {
-	mock *mock.Mock
-}
-
-func (_m *MockExchangeGetter) EXPECT() *MockExchangeGetter_Expecter {
-	return &MockExchangeGetter_Expecter{mock: &_m.Mock}
-}
-
-// GetByID provides a mock function for the type MockExchangeGetter
-func (_mock *MockExchangeGetter) GetByID(ctx context.Context, id int) (exchange.Exchange, error) {
-	ret := _mock.Called(ctx, id)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetByID")
-	}
-
-	var r0 exchange.Exchange
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (exchange.Exchange, error)); ok {
-		return returnFunc(ctx, id)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) exchange.Exchange); ok {
-		r0 = returnFunc(ctx, id)
-	} else {
-		r0 = ret.Get(0).(exchange.Exchange)
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
-		r1 = returnFunc(ctx, id)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// MockExchangeGetter_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
-type MockExchangeGetter_GetByID_Call struct {
-	*mock.Call
-}
-
-// GetByID is a helper method to define mock.On call
-//   - ctx context.Context
-//   - id int
-func (_e *MockExchangeGetter_Expecter) GetByID(ctx any, id any) *MockExchangeGetter_GetByID_Call {
-	return &MockExchangeGetter_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
-}
-
-func (_c *MockExchangeGetter_GetByID_Call) Run(run func(ctx context.Context, id int)) *MockExchangeGetter_GetByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 int
-		if args[1] != nil {
-			arg1 = args[1].(int)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *MockExchangeGetter_GetByID_Call) Return(exchange1 exchange.Exchange, err error) *MockExchangeGetter_GetByID_Call {
-	_c.Call.Return(exchange1, err)
-	return _c
-}
-
-func (_c *MockExchangeGetter_GetByID_Call) RunAndReturn(run func(ctx context.Context, id int) (exchange.Exchange, error)) *MockExchangeGetter_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }

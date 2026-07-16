@@ -1,4 +1,4 @@
-package review
+package review_test
 
 import (
 	"context"
@@ -11,15 +11,16 @@ import (
 	"github.com/jadechy/barterswap/internal/apperrors"
 	"github.com/jadechy/barterswap/internal/exchange"
 	exchangemocks "github.com/jadechy/barterswap/internal/exchange/mocks"
+	"github.com/jadechy/barterswap/internal/review"
 	reviewmocks "github.com/jadechy/barterswap/internal/review/mocks"
 )
 
 func TestCreate_NoteHorsBornes_RetourneErreurValidation(t *testing.T) {
 	repo := reviewmocks.NewMockRepository(t)
 	exchangeRepo := exchangemocks.NewMockRepository(t)
-	svc := NewService(repo, exchangeRepo)
+	svc := review.NewService(repo, exchangeRepo)
 
-	r := &Review{ExchangeID: 1, AuthorID: 1, Note: 6}
+	r := &review.Review{ExchangeID: 1, AuthorID: 1, Note: 6}
 	err := svc.Create(context.Background(), r)
 
 	require.Error(t, err)
@@ -29,9 +30,9 @@ func TestCreate_NoteHorsBornes_RetourneErreurValidation(t *testing.T) {
 func TestCreate_EchangeNonTermine_RetourneErreur(t *testing.T) {
 	repo := reviewmocks.NewMockRepository(t)
 	exchangeRepo := exchangemocks.NewMockRepository(t)
-	svc := NewService(repo, exchangeRepo)
+	svc := review.NewService(repo, exchangeRepo)
 
-	r := &Review{ExchangeID: 1, AuthorID: 1, Note: 5}
+	r := &review.Review{ExchangeID: 1, AuthorID: 1, Note: 5}
 
 	exchangeRepo.EXPECT().
 		GetByID(mock.Anything, 1).
@@ -46,9 +47,9 @@ func TestCreate_EchangeNonTermine_RetourneErreur(t *testing.T) {
 func TestCreate_AuteurHorsEchange_RetourneErreurUnauthorized(t *testing.T) {
 	repo := reviewmocks.NewMockRepository(t)
 	exchangeRepo := exchangemocks.NewMockRepository(t)
-	svc := NewService(repo, exchangeRepo)
+	svc := review.NewService(repo, exchangeRepo)
 
-	r := &Review{ExchangeID: 1, AuthorID: 99, Note: 5}
+	r := &review.Review{ExchangeID: 1, AuthorID: 99, Note: 5}
 
 	exchangeRepo.EXPECT().
 		GetByID(mock.Anything, 1).
@@ -63,9 +64,9 @@ func TestCreate_AuteurHorsEchange_RetourneErreurUnauthorized(t *testing.T) {
 func TestCreate_DejaNote_RetourneErreur(t *testing.T) {
 	repo := reviewmocks.NewMockRepository(t)
 	exchangeRepo := exchangemocks.NewMockRepository(t)
-	svc := NewService(repo, exchangeRepo)
+	svc := review.NewService(repo, exchangeRepo)
 
-	r := &Review{ExchangeID: 1, AuthorID: 1, Note: 5}
+	r := &review.Review{ExchangeID: 1, AuthorID: 1, Note: 5}
 
 	exchangeRepo.EXPECT().
 		GetByID(mock.Anything, 1).
@@ -83,9 +84,9 @@ func TestCreate_DejaNote_RetourneErreur(t *testing.T) {
 func TestCreate_Valide_Succes(t *testing.T) {
 	repo := reviewmocks.NewMockRepository(t)
 	exchangeRepo := exchangemocks.NewMockRepository(t)
-	svc := NewService(repo, exchangeRepo)
+	svc := review.NewService(repo, exchangeRepo)
 
-	r := &Review{ExchangeID: 1, AuthorID: 1, Note: 5, Commentaire: "Top"}
+	r := &review.Review{ExchangeID: 1, AuthorID: 1, Note: 5, Commentaire: "Top"}
 
 	exchangeRepo.EXPECT().
 		GetByID(mock.Anything, 1).
