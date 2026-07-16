@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Logging journalise chaque requête HTTP.
@@ -44,6 +45,11 @@ func CORS(next http.Handler) http.Handler {
 // Auth vérifie la présence et la validité du header X-UserID.
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/swagger/") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		userIDStr := r.Header.Get("X-UserID")
 		if userIDStr == "" {
 			http.Error(w, "header X-UserID manquant", http.StatusUnauthorized)

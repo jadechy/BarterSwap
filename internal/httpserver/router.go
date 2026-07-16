@@ -32,10 +32,9 @@ func NewRouter(h Handlers) *http.ServeMux {
 	mux.HandleFunc("GET /api/users/{id}/skills", h.User.GetSkills)
 	mux.HandleFunc("PUT /api/users/{id}/skills", h.User.SetSkills)
 	mux.HandleFunc("GET /api/users/{id}/stats", h.User.GetStats)
-	// Route montée sous /users/ mais gérée par le domaine review (cf. discussion précédente)
 	mux.HandleFunc("GET /api/users/{id}/reviews", h.Review.GetByUserID)
 
-	// --- Offers (anciennement "services") ---
+	// --- Offers  ---
 	// mux.HandleFunc("GET /api/services", h.Offer.List)
 	mux.HandleFunc("POST /api/services", h.Offer.Create)
 	mux.HandleFunc("GET /api/services/{id}", h.Offer.GetByID)

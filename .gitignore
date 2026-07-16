@@ -1,2 +1,5 @@
 .cache
 .config
+.db-initialized
+.env
+.env.dev
