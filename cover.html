@@ -1,0 +1,1991 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>api: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/jadechy/barterswap/cmd/api/main.go (0.0%)</option>
+				
+				<option value="file1">github.com/jadechy/barterswap/internal/apperrors/errors.go (100.0%)</option>
+				
+				<option value="file2">github.com/jadechy/barterswap/internal/database/db.go (0.0%)</option>
+				
+				<option value="file3">github.com/jadechy/barterswap/internal/dbx/querier.go (80.0%)</option>
+				
+				<option value="file4">github.com/jadechy/barterswap/internal/exchange/handler.go (89.0%)</option>
+				
+				<option value="file5">github.com/jadechy/barterswap/internal/exchange/repository.go (0.0%)</option>
+				
+				<option value="file6">github.com/jadechy/barterswap/internal/exchange/service.go (78.4%)</option>
+				
+				<option value="file7">github.com/jadechy/barterswap/internal/httpserver/middleware.go (100.0%)</option>
+				
+				<option value="file8">github.com/jadechy/barterswap/internal/httpserver/router.go (100.0%)</option>
+				
+				<option value="file9">github.com/jadechy/barterswap/internal/httpx/respond.go (92.9%)</option>
+				
+				<option value="file10">github.com/jadechy/barterswap/internal/offer/handler.go (100.0%)</option>
+				
+				<option value="file11">github.com/jadechy/barterswap/internal/offer/repository.go (33.9%)</option>
+				
+				<option value="file12">github.com/jadechy/barterswap/internal/offer/service.go (96.4%)</option>
+				
+				<option value="file13">github.com/jadechy/barterswap/internal/review/handler.go (94.6%)</option>
+				
+				<option value="file14">github.com/jadechy/barterswap/internal/review/repository.go (77.1%)</option>
+				
+				<option value="file15">github.com/jadechy/barterswap/internal/review/service.go (85.7%)</option>
+				
+				<option value="file16">github.com/jadechy/barterswap/internal/user/handler.go (93.3%)</option>
+				
+				<option value="file17">github.com/jadechy/barterswap/internal/user/repository.go (35.8%)</option>
+				
+				<option value="file18">github.com/jadechy/barterswap/internal/user/service.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "log"
+        "net/http"
+        "os"
+
+        "github.com/jadechy/barterswap/internal/database"
+        "github.com/jadechy/barterswap/internal/dbx"
+        "github.com/jadechy/barterswap/internal/exchange"
+        "github.com/jadechy/barterswap/internal/httpserver"
+        "github.com/jadechy/barterswap/internal/offer"
+        "github.com/jadechy/barterswap/internal/review"
+        "github.com/jadechy/barterswap/internal/user"
+)
+
+// @title           Barterswap
+// @version         1.0
+// @description     API de troc de services entre particuliers, basé sur des crédits-temps.
+// @host            localhost:8080
+// @BasePath        /api
+
+// @securityDefinitions.apikey  UserIDAuth
+// @in                          header
+// @name                        X-UserID
+func main() <span class="cov0" title="0">{
+        db, err := database.Open()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal(err)
+        }</span>
+        <span class="cov0" title="0">defer func() </span><span class="cov0" title="0">{
+                if cerr := db.Close(); cerr != nil </span><span class="cov0" title="0">{
+                        log.Printf("erreur fermeture DB: %v", cerr)
+                }</span>
+        }()
+        <span class="cov0" title="0">txManager := dbx.NewTxManager(db)
+
+        userRepo := user.NewRepository(db)
+        userService := user.NewService(userRepo)
+        userHandler := user.NewHandler(userService)
+
+        offerRepo := offer.NewRepository(db)
+        offerService := offer.NewService(offerRepo, userRepo)
+        offerHandler := offer.NewHandler(offerService)
+
+        exchangeRepo := exchange.NewRepository(db)
+        exchangeService := exchange.NewService(exchangeRepo, txManager, offerRepo, userRepo, userRepo)
+        exchangeHandler := exchange.NewHandler(exchangeService)
+
+        reviewRepo := review.NewRepository(db)
+        reviewService := review.NewService(reviewRepo, exchangeRepo)
+        reviewHandler := review.NewHandler(reviewService)
+
+        mux := httpserver.NewRouter(httpserver.Handlers{
+                User:     userHandler,
+                Offer:    offerHandler,
+                Exchange: exchangeHandler,
+                Review:   reviewHandler,
+        })
+
+        port := os.Getenv("PORT")
+        if port == "" </span><span class="cov0" title="0">{
+                port = "8080"
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("Serveur démarré sur le port %s", port)
+        log.Fatal(http.ListenAndServe(":"+port, httpserver.ApplyMiddlewares(mux)))</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package apperrors
+
+import (
+        "errors"
+        "fmt"
+)
+
+var (
+        ErrNotFound            = errors.New("ressource introuvable")
+        ErrInsufficientCredits = errors.New("crédits insuffisants")
+        ErrExchangeConflict    = errors.New("un échange est déjà en cours pour ce service")
+        ErrSelfExchange        = errors.New("impossible de s'échanger un service à soi-même")
+        ErrExchangeNotDone     = errors.New("l'échange n'est pas terminé")
+        ErrAlreadyReviewed     = errors.New("vous avez déjà laissé un avis pour cet échange")
+        ErrInvalidStatus       = errors.New("transition de statut invalide")
+        ErrUnauthorized        = errors.New("action non autorisée")
+        ErrValidation          = errors.New("données invalides")
+)
+
+type ValidationError struct {
+        Champ   string
+        Message string
+}
+
+func (e ValidationError) Error() string <span class="cov8" title="1">{
+        return fmt.Sprintf("validation échouée sur %s : %s", e.Champ, e.Message)
+}</span>
+
+func (e ValidationError) Is(target error) bool <span class="cov8" title="1">{
+        return target == ErrValidation
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package database
+
+import (
+        "database/sql"
+        "fmt"
+        "log"
+        "os"
+        "time"
+
+        _ "github.com/go-sql-driver/mysql"
+)
+
+// Open initialise la connexion à la base de données MySQL à partir de DB_DSN.
+func Open() (*sql.DB, error) <span class="cov0" title="0">{
+        dsn := os.Getenv("DB_DSN")
+        if dsn == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("DB_DSN non défini")
+        }</span>
+
+        <span class="cov0" title="0">db, err := sql.Open("mysql", dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("erreur ouverture DB: %w", err)
+        }</span>
+
+        // Limites de pool explicites : évite d'épuiser les connexions MySQL
+        // sous charge, et borne la durée de vie des connexions pour absorber
+        // les redémarrages/rotations côté serveur DB sans erreurs en cascade.
+        <span class="cov0" title="0">db.SetMaxOpenConns(25)
+        db.SetMaxIdleConns(25)
+        db.SetConnMaxLifetime(5 * time.Minute)
+
+        if err := db.Ping(); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("erreur connexion DB: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">log.Println("Connexion à la base de données établie")
+        return db, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package dbx
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+        "fmt"
+        "log"
+)
+
+// Querier est satisfaite à la fois par *sql.DB et *sql.Tx —
+// ça permet aux repositories d'écrire du code SQL identique,
+// qu'ils soient appelés en dehors ou à l'intérieur d'une transaction.
+type Querier interface {
+        QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+        QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+        ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+}
+type TxRunner interface {
+        WithTx(ctx context.Context, fn func(q Querier) error) error
+}
+type TxManager struct {
+        db *sql.DB
+}
+
+func NewTxManager(db *sql.DB) *TxManager <span class="cov8" title="1">{
+        return &amp;TxManager{db: db}
+}</span>
+
+// WithTx ouvre une transaction, exécute fn avec un Querier lié à cette transaction,
+// commit si fn réussit, rollback sinon (ou en cas de panic).
+func (tm *TxManager) WithTx(ctx context.Context, fn func(q Querier) error) error <span class="cov8" title="1">{
+        tx, err := tm.db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("dbx.WithTx begin: %w", err)
+        }</span>
+        <span class="cov8" title="1">defer func() </span><span class="cov8" title="1">{
+                if rerr := tx.Rollback(); rerr != nil &amp;&amp; !errors.Is(rerr, sql.ErrTxDone) </span><span class="cov0" title="0">{
+                        log.Printf("dbx.WithTx: erreur rollback: %v", rerr)
+                }</span>
+        }()
+
+        <span class="cov8" title="1">if err := fn(tx); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return tx.Commit()</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package exchange
+
+import (
+        "encoding/json"
+        "errors"
+        "net/http"
+        "strconv"
+
+        "github.com/jadechy/barterswap/internal/httpx"
+)
+
+type Handler struct {
+        service *Service
+}
+
+func NewHandler(service *Service) *Handler <span class="cov8" title="1">{
+        return &amp;Handler{service: service}
+}</span>
+
+func currentUserID(r *http.Request) (int, error) <span class="cov8" title="1">{
+        return strconv.Atoi(r.Header.Get("X-UserID"))
+}</span>
+
+func parseAction(r *http.Request) (exchangeID, userID int, err error) <span class="cov8" title="1">{
+        exchangeID, err = strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                return 0, 0, errors.New("id invalide")
+        }</span>
+        <span class="cov8" title="1">userID, err = currentUserID(r)
+        if err != nil </span><span class="cov8" title="1">{
+                return 0, 0, errors.New("X-UserID requis")
+        }</span>
+        <span class="cov8" title="1">return exchangeID, userID, nil</span>
+}
+
+// Create godoc
+// @Summary      Créer une demande d'échange
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Accept       json
+// @Produce      json
+// @Param        exchange body object true "service_id"
+// @Success      201 {object} Exchange
+// @Router       /exchanges [post]
+func (h *Handler) Create(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userID, err := currentUserID(r)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusUnauthorized, map[string]string{"error": "X-UserID requis"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">var body struct {
+                ServiceID int `json:"service_id"`
+        }
+        if err := json.NewDecoder(r.Body).Decode(&amp;body); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">e, err := h.service.Create(r.Context(), userID, body.ServiceID)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusCreated, e)</span>
+}
+
+func (h *Handler) List(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userID, err := currentUserID(r)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusUnauthorized, map[string]string{"error": "X-UserID requis"})
+                return
+        }</span>
+        <span class="cov8" title="1">status := r.URL.Query().Get("status")
+
+        exchanges, err := h.service.List(r.Context(), userID, status)
+        if err != nil </span><span class="cov0" title="0">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, exchanges)</span>
+}
+
+func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">e, err := h.service.GetByID(r.Context(), id)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, e)</span>
+}
+
+// Accept godoc
+// @Summary      Accepter un échange
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Param        id path int true "ID échange"
+// @Success      200 {object} map[string]string
+// @Router       /exchanges/{id}/accept [put]
+func (h *Handler) Accept(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, userID, err := parseAction(r)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov8" title="1">if err := h.service.Accept(r.Context(), id, userID); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange accepté"})</span>
+}
+
+func (h *Handler) Reject(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, userID, err := parseAction(r)
+        if err != nil </span><span class="cov0" title="0">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov8" title="1">if err := h.service.Reject(r.Context(), id, userID); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange refusé"})</span>
+}
+
+func (h *Handler) Complete(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, userID, err := parseAction(r)
+        if err != nil </span><span class="cov0" title="0">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov8" title="1">if err := h.service.Complete(r.Context(), id, userID); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange terminé"})</span>
+}
+
+func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, userID, err := parseAction(r)
+        if err != nil </span><span class="cov0" title="0">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov8" title="1">if err := h.service.Cancel(r.Context(), id, userID); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange annulé"})</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package exchange
+
+import (
+        "context"
+        "database/sql"
+        "fmt"
+        "log"
+
+        "github.com/jadechy/barterswap/internal/apperrors"
+        "github.com/jadechy/barterswap/internal/dbx"
+)
+
+type Repository interface {
+        GetByID(ctx context.Context, id int) (Exchange, error)
+        List(ctx context.Context, userID int, status string) ([]Exchange, error)
+        Create(ctx context.Context, e *Exchange) error
+        HasActive(ctx context.Context, serviceID int) (bool, error)
+        // UpdateStatus prend un Querier explicite : appelé depuis Service dans une tx
+        // partagée avec l'écriture des credit_transactions.
+        UpdateStatus(ctx context.Context, q dbx.Querier, id int, status string) error
+}
+
+type sqlRepository struct {
+        db *sql.DB
+}
+
+func NewRepository(db *sql.DB) Repository <span class="cov0" title="0">{
+        return &amp;sqlRepository{db: db}
+}</span>
+
+func (r *sqlRepository) GetByID(ctx context.Context, id int) (Exchange, error) <span class="cov0" title="0">{
+        var e Exchange
+        row := r.db.QueryRowContext(ctx, `
+                SELECT id, service_id, requester_id, owner_id, status, created_at, updated_at
+                FROM exchanges WHERE id = ?`, id)
+
+        err := row.Scan(&amp;e.ID, &amp;e.ServiceID, &amp;e.RequesterID, &amp;e.OwnerID,
+                &amp;e.Status, &amp;e.CreatedAt, &amp;e.UpdatedAt)
+        if err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                return e, fmt.Errorf("exchange %d: %w", id, apperrors.ErrNotFound)
+
+        }</span>
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return e, fmt.Errorf("exchange.GetByID: %w", err)
+        }</span>
+        <span class="cov0" title="0">return e, nil</span>
+}
+
+func (r *sqlRepository) List(ctx context.Context, userID int, status string) ([]Exchange, error) <span class="cov0" title="0">{
+        query := `SELECT id, service_id, requester_id, owner_id, status, created_at, updated_at
+                  FROM exchanges WHERE (requester_id = ? OR owner_id = ?)`
+        args := []any{userID, userID}
+
+        if status != "" </span><span class="cov0" title="0">{
+                query += " AND status = ?"
+                args = append(args, status)
+        }</span>
+
+        <span class="cov0" title="0">rows, err := r.db.QueryContext(ctx, query, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("exchange.List: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer func() </span><span class="cov0" title="0">{
+                if cerr := rows.Close(); cerr != nil </span><span class="cov0" title="0">{
+                        log.Printf("exchange.List: erreur fermeture rows: %v", cerr)
+                }</span>
+        }()
+
+        <span class="cov0" title="0">var exchanges []Exchange
+        for rows.Next() </span><span class="cov0" title="0">{
+                var e Exchange
+                if err := rows.Scan(&amp;e.ID, &amp;e.ServiceID, &amp;e.RequesterID, &amp;e.OwnerID,
+                        &amp;e.Status, &amp;e.CreatedAt, &amp;e.UpdatedAt); err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("exchange.List scan: %w", err)
+                }</span>
+                <span class="cov0" title="0">exchanges = append(exchanges, e)</span>
+        }
+        <span class="cov0" title="0">if err := rows.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("exchange.List rows: %w", err)
+        }</span>
+        <span class="cov0" title="0">return exchanges, nil</span>
+}
+
+func (r *sqlRepository) Create(ctx context.Context, e *Exchange) error <span class="cov0" title="0">{
+        result, err := r.db.ExecContext(ctx, `
+                INSERT INTO exchanges (service_id, requester_id, owner_id, status)
+                VALUES (?, ?, ?, 'pending')`,
+                e.ServiceID, e.RequesterID, e.OwnerID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("exchange.Create: %w", err)
+        }</span>
+        <span class="cov0" title="0">id, _ := result.LastInsertId()
+        e.ID = int(id)
+        return nil</span>
+}
+
+func (r *sqlRepository) HasActive(ctx context.Context, serviceID int) (bool, error) <span class="cov0" title="0">{
+        var count int
+        err := r.db.QueryRowContext(ctx, `
+                SELECT COUNT(*) FROM exchanges
+                WHERE service_id = ? AND status IN ('pending', 'accepted')`, serviceID).Scan(&amp;count)
+        if err != nil </span><span class="cov0" title="0">{
+                return false, fmt.Errorf("exchange.HasActive: %w", err)
+        }</span>
+        <span class="cov0" title="0">return count &gt; 0, nil</span>
+}
+
+func (r *sqlRepository) UpdateStatus(ctx context.Context, q dbx.Querier, id int, status string) error <span class="cov0" title="0">{
+        result, err := q.ExecContext(ctx, `UPDATE exchanges SET status = ? WHERE id = ?`, status, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("exchange.UpdateStatus: %w", err)
+        }</span>
+        <span class="cov0" title="0">rows, err := result.RowsAffected()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("exchange.UpdateStatus rowsAffected: %w", err)
+        }</span>
+        <span class="cov0" title="0">if rows == 0 </span><span class="cov0" title="0">{
+                return fmt.Errorf("échange %d: %w", id, apperrors.ErrNotFound)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package exchange
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/jadechy/barterswap/internal/apperrors"
+        "github.com/jadechy/barterswap/internal/dbx"
+        "github.com/jadechy/barterswap/internal/offer"
+        "github.com/jadechy/barterswap/internal/user"
+)
+
+type OfferGetter interface {
+        GetByID(ctx context.Context, id int) (offer.Offer, error)
+}
+
+type UserGetter interface {
+        GetByID(ctx context.Context, id int) (user.User, error)
+}
+
+type CreditLedger interface {
+        AddCreditTransaction(ctx context.Context, q dbx.Querier, userID int, exchangeID *int, montant int, typ string) error
+}
+
+type Service struct {
+        repo      Repository
+        txManager dbx.TxRunner
+        offers    OfferGetter
+        users     UserGetter
+        credits   CreditLedger
+}
+
+func NewService(repo Repository, txManager dbx.TxRunner, offers OfferGetter, users UserGetter, credits CreditLedger) *Service <span class="cov8" title="1">{
+        return &amp;Service{repo: repo, txManager: txManager, offers: offers, users: users, credits: credits}
+}</span>
+
+func (s *Service) Create(ctx context.Context, requesterID, offerID int) (Exchange, error) <span class="cov8" title="1">{
+        var e Exchange
+
+        o, err := s.offers.GetByID(ctx, offerID)
+        if err != nil </span><span class="cov0" title="0">{
+                return e, err
+        }</span>
+
+        <span class="cov8" title="1">if o.ProviderID == requesterID </span><span class="cov8" title="1">{
+                return e, fmt.Errorf("impossible de s'échanger son propre service: %w", apperrors.ErrSelfExchange)
+        }</span>
+
+        <span class="cov8" title="1">active, err := s.repo.HasActive(ctx, offerID)
+        if err != nil </span><span class="cov0" title="0">{
+                return e, err
+        }</span>
+        <span class="cov8" title="1">if active </span><span class="cov8" title="1">{
+                return e, fmt.Errorf("ce service a déjà un échange en cours: %w", apperrors.ErrExchangeConflict)
+        }</span>
+
+        <span class="cov8" title="1">requester, err := s.users.GetByID(ctx, requesterID)
+        if err != nil </span><span class="cov0" title="0">{
+                return e, err
+        }</span>
+        <span class="cov8" title="1">if requester.CreditBalance &lt; o.Credits </span><span class="cov8" title="1">{
+                return e, fmt.Errorf("solde insuffisant: %w", apperrors.ErrInsufficientCredits)
+        }</span>
+
+        <span class="cov8" title="1">e = Exchange{
+                ServiceID:   offerID,
+                RequesterID: requesterID,
+                OwnerID:     o.ProviderID,
+        }
+        err = s.repo.Create(ctx, &amp;e)
+        return e, err</span>
+}
+
+func (s *Service) GetByID(ctx context.Context, id int) (Exchange, error) <span class="cov8" title="1">{
+        return s.repo.GetByID(ctx, id)
+}</span>
+
+func (s *Service) List(ctx context.Context, userID int, status string) ([]Exchange, error) <span class="cov8" title="1">{
+        return s.repo.List(ctx, userID, status)
+}</span>
+
+func (s *Service) Accept(ctx context.Context, exchangeID, userID int) error <span class="cov8" title="1">{
+        e, err := s.repo.GetByID(ctx, exchangeID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if e.OwnerID != userID </span><span class="cov8" title="1">{
+                return fmt.Errorf("seul le propriétaire du service peut accepter: %w", apperrors.ErrUnauthorized)
+        }</span>
+        <span class="cov8" title="1">if e.Status != "pending" </span><span class="cov8" title="1">{
+                return fmt.Errorf("l'échange n'est pas en attente: %w", apperrors.ErrInvalidStatus)
+        }</span>
+
+        <span class="cov8" title="1">o, err := s.offers.GetByID(ctx, e.ServiceID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return s.txManager.WithTx(ctx, func(q dbx.Querier) error </span><span class="cov8" title="1">{
+                if err := s.credits.AddCreditTransaction(ctx, q, e.RequesterID, &amp;exchangeID, -o.Credits, "spend"); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">return s.repo.UpdateStatus(ctx, q, exchangeID, "accepted")</span>
+        })
+}
+
+func (s *Service) Reject(ctx context.Context, exchangeID, userID int) error <span class="cov8" title="1">{
+        e, err := s.repo.GetByID(ctx, exchangeID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if e.OwnerID != userID </span><span class="cov8" title="1">{
+                return fmt.Errorf("seul le propriétaire du service peut refuser: %w", apperrors.ErrUnauthorized)
+        }</span>
+        <span class="cov8" title="1">if e.Status != "pending" </span><span class="cov0" title="0">{
+                return fmt.Errorf("l'échange n'est pas en attente: %w", apperrors.ErrInvalidStatus)
+        }</span>
+
+        <span class="cov8" title="1">return s.txManager.WithTx(ctx, func(q dbx.Querier) error </span><span class="cov8" title="1">{
+                return s.repo.UpdateStatus(ctx, q, exchangeID, "rejected")
+        }</span>)
+}
+
+func (s *Service) Complete(ctx context.Context, exchangeID, userID int) error <span class="cov8" title="1">{
+        e, err := s.repo.GetByID(ctx, exchangeID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if e.OwnerID != userID &amp;&amp; e.RequesterID != userID </span><span class="cov0" title="0">{
+                return fmt.Errorf("vous ne faites pas partie de cet échange: %w", apperrors.ErrUnauthorized)
+        }</span>
+        <span class="cov8" title="1">if e.Status != "accepted" </span><span class="cov8" title="1">{
+                return fmt.Errorf("l'échange doit être accepté pour être terminé: %w", apperrors.ErrInvalidStatus)
+        }</span>
+
+        <span class="cov8" title="1">o, err := s.offers.GetByID(ctx, e.ServiceID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return s.txManager.WithTx(ctx, func(q dbx.Querier) error </span><span class="cov8" title="1">{
+                if err := s.credits.AddCreditTransaction(ctx, q, e.OwnerID, &amp;exchangeID, o.Credits, "earn"); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">return s.repo.UpdateStatus(ctx, q, exchangeID, "completed")</span>
+        })
+}
+
+func (s *Service) Cancel(ctx context.Context, exchangeID, userID int) error <span class="cov8" title="1">{
+        e, err := s.repo.GetByID(ctx, exchangeID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if e.OwnerID != userID &amp;&amp; e.RequesterID != userID </span><span class="cov8" title="1">{
+                return fmt.Errorf("vous ne faites pas partie de cet échange: %w", apperrors.ErrUnauthorized)
+        }</span>
+        <span class="cov8" title="1">if e.Status != "pending" &amp;&amp; e.Status != "accepted" </span><span class="cov0" title="0">{
+                return fmt.Errorf("cet échange ne peut plus être annulé: %w", apperrors.ErrInvalidStatus)
+        }</span>
+
+        <span class="cov8" title="1">return s.txManager.WithTx(ctx, func(q dbx.Querier) error </span><span class="cov8" title="1">{
+                if e.Status == "accepted" </span><span class="cov8" title="1">{
+                        o, err := s.offers.GetByID(ctx, e.ServiceID)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                        <span class="cov8" title="1">if err := s.credits.AddCreditTransaction(ctx, q, e.RequesterID, &amp;exchangeID, o.Credits, "refund"); err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                }
+                <span class="cov8" title="1">return s.repo.UpdateStatus(ctx, q, exchangeID, "cancelled")</span>
+        })
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package httpserver
+
+import (
+        "log"
+        "net/http"
+        "strconv"
+
+        "github.com/jadechy/barterswap/internal/httpx"
+)
+
+// Logging journalise chaque requête HTTP.
+func Logging(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                log.Printf("%s %s", r.Method, r.URL.Path)
+                next.ServeHTTP(w, r)
+        }</span>)
+}
+
+// Recovery récupère les panics et renvoie un 500 plutôt que de faire crasher le serveur.
+func Recovery(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                defer func() </span><span class="cov8" title="1">{
+                        if err := recover(); err != nil </span><span class="cov8" title="1">{
+                                log.Printf("panic: %v", err)
+                                http.Error(w, "erreur interne du serveur", http.StatusInternalServerError)
+                        }</span>
+                }()
+                <span class="cov8" title="1">next.ServeHTTP(w, r)</span>
+        })
+}
+
+// CORS ajoute les headers nécessaires aux requêtes cross-origin.
+func CORS(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                w.Header().Set("Access-Control-Allow-Origin", "*")
+                w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+                w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-UserID")
+                if r.Method == http.MethodOptions </span><span class="cov8" title="1">{
+                        w.WriteHeader(http.StatusNoContent)
+                        return
+                }</span>
+                <span class="cov8" title="1">next.ServeHTTP(w, r)</span>
+        })
+}
+
+// Auth vérifie la présence et la validité du header X-UserID.
+func Auth(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                userIDStr := r.Header.Get("X-UserID")
+                if userIDStr == "" </span><span class="cov8" title="1">{
+                        httpx.WriteJSON(w, http.StatusUnauthorized, map[string]string{"error": "header X-UserID manquant"})
+                        return
+                }</span>
+                <span class="cov8" title="1">if _, err := strconv.Atoi(userIDStr); err != nil </span><span class="cov8" title="1">{
+                        httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "X-UserID invalide"})
+                        return
+                }</span>
+                <span class="cov8" title="1">next.ServeHTTP(w, r)</span>
+        })
+}
+
+// ApplyMiddlewares chaîne tous les middlewares dans l'ordre d'exécution souhaité.
+func ApplyMiddlewares(h http.Handler) http.Handler <span class="cov8" title="1">{
+        h = Auth(h)
+        h = CORS(h)
+        h = Recovery(h)
+        h = Logging(h)
+        return h
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package httpserver
+
+import (
+        "net/http"
+
+        httpSwagger "github.com/swaggo/http-swagger"
+
+        _ "github.com/jadechy/barterswap/docs"
+        exchangehttp "github.com/jadechy/barterswap/internal/exchange"
+        offerhttp "github.com/jadechy/barterswap/internal/offer"
+        reviewhttp "github.com/jadechy/barterswap/internal/review"
+        userhttp "github.com/jadechy/barterswap/internal/user"
+)
+
+// Handlers regroupe tous les handlers de domaine nécessaires au routeur.
+// Ça évite une signature NewRouter(a, b, c, d) où l'ordre des paramètres
+// devient source d'erreur à mesure que le nombre de domaines grandit.
+type Handlers struct {
+        User     *userhttp.Handler
+        Offer    *offerhttp.Handler
+        Exchange *exchangehttp.Handler
+        Review   *reviewhttp.Handler
+}
+
+func NewRouter(h Handlers) *http.ServeMux <span class="cov8" title="1">{
+        mux := http.NewServeMux()
+
+        // --- Users ---
+        mux.HandleFunc("POST /api/users", h.User.Create)
+        mux.HandleFunc("GET /api/users/{id}", h.User.GetByID)
+        mux.HandleFunc("PUT /api/users/{id}", h.User.Update)
+        mux.HandleFunc("GET /api/users/{id}/skills", h.User.GetSkills)
+        mux.HandleFunc("PUT /api/users/{id}/skills", h.User.SetSkills)
+        mux.HandleFunc("GET /api/users/{id}/stats", h.User.GetStats)
+        mux.HandleFunc("GET /api/users/{id}/reviews", h.Review.GetByUserID)
+
+        // --- Offers  ---
+        // mux.HandleFunc("GET /api/services", h.Offer.List)
+        mux.HandleFunc("POST /api/services", h.Offer.Create)
+        mux.HandleFunc("GET /api/services/{id}", h.Offer.GetByID)
+        // mux.HandleFunc("PUT /api/services/{id}", h.Offer.Update)
+        // mux.HandleFunc("DELETE /api/services/{id}", h.Offer.Delete)
+        mux.HandleFunc("GET /api/services/{id}/reviews", h.Review.GetByServiceID)
+
+        // --- Exchanges ---
+        mux.HandleFunc("GET /api/exchanges", h.Exchange.List)
+        mux.HandleFunc("POST /api/exchanges", h.Exchange.Create)
+        mux.HandleFunc("GET /api/exchanges/{id}", h.Exchange.GetByID)
+        mux.HandleFunc("PUT /api/exchanges/{id}/accept", h.Exchange.Accept)
+        mux.HandleFunc("PUT /api/exchanges/{id}/reject", h.Exchange.Reject)
+        mux.HandleFunc("PUT /api/exchanges/{id}/complete", h.Exchange.Complete)
+        mux.HandleFunc("PUT /api/exchanges/{id}/cancel", h.Exchange.Cancel)
+        mux.HandleFunc("POST /api/exchanges/{id}/review", h.Review.Create)
+
+        mux.Handle("GET /swagger/", httpSwagger.WrapHandler)
+
+        return mux
+}</span>
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package httpx
+
+import (
+        "encoding/json"
+        "errors"
+        "log"
+        "net/http"
+
+        "github.com/jadechy/barterswap/internal/apperrors"
+)
+
+// WriteJSON écrit une réponse JSON avec le status donné.
+func WriteJSON(w http.ResponseWriter, status int, data any) <span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(status)
+        if err := json.NewEncoder(w).Encode(data); err != nil </span><span class="cov0" title="0">{
+                // Le corps est déjà parti (header + status écrits), on ne peut plus
+                // changer le status ici. On journalise pour ne pas perdre l'info silencieusement.
+                log.Printf("httpx: échec encodage JSON: %v", err)
+        }</span>
+}
+
+// WriteError mappe une erreur de domaine (apperrors) vers le status HTTP approprié
+// et écrit une réponse JSON standardisée {"error": "..."}.
+func WriteError(w http.ResponseWriter, err error) <span class="cov8" title="1">{
+        if valErr, ok := errors.AsType[apperrors.ValidationError](err); ok </span><span class="cov8" title="1">{
+                WriteJSON(w, http.StatusBadRequest, map[string]string{
+                        "error": valErr.Error(),
+                        "champ": valErr.Champ,
+                })
+                return
+        }</span>
+
+        <span class="cov8" title="1">switch </span>{
+        case errors.Is(err, apperrors.ErrNotFound):<span class="cov8" title="1">
+                WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})</span>
+        case errors.Is(err, apperrors.ErrValidation),
+                errors.Is(err, apperrors.ErrSelfExchange),
+                errors.Is(err, apperrors.ErrInsufficientCredits),
+                errors.Is(err, apperrors.ErrExchangeNotDone),
+                errors.Is(err, apperrors.ErrAlreadyReviewed),
+                errors.Is(err, apperrors.ErrInvalidStatus):<span class="cov8" title="1">
+                WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})</span>
+        case errors.Is(err, apperrors.ErrExchangeConflict):<span class="cov8" title="1">
+                WriteJSON(w, http.StatusConflict, map[string]string{"error": err.Error()})</span>
+        case errors.Is(err, apperrors.ErrUnauthorized):<span class="cov8" title="1">
+                WriteJSON(w, http.StatusForbidden, map[string]string{"error": err.Error()})</span>
+        default:<span class="cov8" title="1">
+                log.Printf("httpx: erreur interne non mappée: %v", err)
+                WriteJSON(w, http.StatusInternalServerError, map[string]string{"error": "erreur interne"})</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package offer
+
+import (
+        "encoding/json"
+        "net/http"
+        "strconv"
+
+        "github.com/jadechy/barterswap/internal/httpx"
+)
+
+type Handler struct {
+        service *Service
+}
+
+func NewHandler(service *Service) *Handler <span class="cov8" title="1">{
+        return &amp;Handler{service: service}
+}</span>
+
+// Create godoc
+// @Summary      Créer une offre de service
+// @Tags         offers
+// @Security     UserIDAuth
+// @Accept       json
+// @Produce      json
+// @Param        offer body Offer true "Offre à créer"
+// @Success      201 {object} Offer
+// @Failure      400 {object} map[string]string
+// @Router       /services [post]
+func (h *Handler) Create(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var o Offer
+        if err := json.NewDecoder(r.Body).Decode(&amp;o); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">if err := h.service.Create(r.Context(), &amp;o); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusCreated, o)</span>
+}
+
+// GetByID godoc
+// @Summary      Récupérer une offre par ID
+// @Tags         offers
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        id path int true "ID de l'offre"
+// @Success      200 {object} Offer
+// @Failure      404 {object} map[string]string
+// @Router       /services/{id} [get]
+func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">o, err := h.service.GetByID(r.Context(), id)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, o)</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package offer
+
+import (
+        "context"
+        "database/sql"
+        "fmt"
+        "log"
+
+        "github.com/jadechy/barterswap/internal/apperrors"
+)
+
+type Repository interface {
+        GetByID(ctx context.Context, id int) (Offer, error)
+        List(ctx context.Context, f ListFilter) ([]Offer, error)
+        Create(ctx context.Context, o *Offer) error
+        Update(ctx context.Context, id int, o *Offer) error
+        Delete(ctx context.Context, id int) error
+}
+
+type sqlRepository struct {
+        db *sql.DB
+}
+
+func NewRepository(db *sql.DB) Repository <span class="cov8" title="1">{
+        return &amp;sqlRepository{db: db}
+}</span>
+
+func (r *sqlRepository) GetByID(ctx context.Context, id int) (Offer, error) <span class="cov8" title="1">{
+        var o Offer
+        row := r.db.QueryRowContext(ctx, `
+                SELECT id, provider_id, titre, description, categorie,
+                       duree_minutes, credits, ville, actif, created_at
+                FROM services WHERE id = ?`, id)
+
+        err := row.Scan(&amp;o.ID, &amp;o.ProviderID, &amp;o.Titre, &amp;o.Description,
+                &amp;o.Categorie, &amp;o.DureeMinutes, &amp;o.Credits, &amp;o.Ville, &amp;o.Actif, &amp;o.CreatedAt)
+        if err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                return o, fmt.Errorf("offre %d: %w", id, apperrors.ErrNotFound)
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return o, fmt.Errorf("offer.GetByID: %w", err)
+        }</span>
+        <span class="cov8" title="1">return o, nil</span>
+}
+
+func (r *sqlRepository) List(ctx context.Context, f ListFilter) ([]Offer, error) <span class="cov0" title="0">{
+        query := `SELECT id, provider_id, titre, description, categorie,
+                         duree_minutes, credits, ville, actif, created_at
+                  FROM services WHERE actif = true`
+        args := []any{}
+
+        if f.Categorie != "" </span><span class="cov0" title="0">{
+                query += " AND categorie = ?"
+                args = append(args, f.Categorie)
+        }</span>
+        <span class="cov0" title="0">if f.Ville != "" </span><span class="cov0" title="0">{
+                query += " AND ville = ?"
+                args = append(args, f.Ville)
+        }</span>
+        <span class="cov0" title="0">if f.Search != "" </span><span class="cov0" title="0">{
+                query += " AND (titre LIKE ? OR description LIKE ?)"
+                args = append(args, "%"+f.Search+"%", "%"+f.Search+"%")
+        }</span>
+
+        <span class="cov0" title="0">rows, err := r.db.QueryContext(ctx, query, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("offer.List: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer func() </span><span class="cov0" title="0">{
+                if cerr := rows.Close(); cerr != nil </span><span class="cov0" title="0">{
+                        log.Printf("offer.List: erreur fermeture rows: %v", cerr)
+                }</span>
+        }()
+
+        <span class="cov0" title="0">var offers []Offer
+        for rows.Next() </span><span class="cov0" title="0">{
+                var o Offer
+                if err := rows.Scan(&amp;o.ID, &amp;o.ProviderID, &amp;o.Titre, &amp;o.Description,
+                        &amp;o.Categorie, &amp;o.DureeMinutes, &amp;o.Credits, &amp;o.Ville, &amp;o.Actif, &amp;o.CreatedAt); err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("offer.List scan: %w", err)
+                }</span>
+                <span class="cov0" title="0">offers = append(offers, o)</span>
+        }
+        <span class="cov0" title="0">if err := rows.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("offer.List rows: %w", err)
+        }</span>
+        <span class="cov0" title="0">return offers, nil</span>
+}
+
+func (r *sqlRepository) Create(ctx context.Context, o *Offer) error <span class="cov8" title="1">{
+        result, err := r.db.ExecContext(ctx, `
+                INSERT INTO services (provider_id, titre, description, categorie, duree_minutes, credits, ville, actif)
+                VALUES (?, ?, ?, ?, ?, ?, ?, true)`,
+                o.ProviderID, o.Titre, o.Description, o.Categorie, o.DureeMinutes, o.Credits, o.Ville)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("offer.Create: %w", err)
+        }</span>
+        <span class="cov8" title="1">id, _ := result.LastInsertId()
+        o.ID = int(id)
+        return nil</span>
+}
+
+func (r *sqlRepository) Update(ctx context.Context, id int, o *Offer) error <span class="cov0" title="0">{
+        result, err := r.db.ExecContext(ctx, `
+                UPDATE services SET titre = ?, description = ?, categorie = ?,
+                duree_minutes = ?, credits = ?, ville = ?, actif = ?
+                WHERE id = ?`,
+                o.Titre, o.Description, o.Categorie, o.DureeMinutes, o.Credits, o.Ville, o.Actif, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("offer.Update: %w", err)
+        }</span>
+        <span class="cov0" title="0">rows, err := result.RowsAffected()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("offer.Update rowsAffected: %w", err)
+        }</span>
+        <span class="cov0" title="0">if rows == 0 </span><span class="cov0" title="0">{
+                return fmt.Errorf("service %d: %w", id, apperrors.ErrNotFound)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (r *sqlRepository) Delete(ctx context.Context, id int) error <span class="cov8" title="1">{
+        result, err := r.db.ExecContext(ctx, `DELETE FROM services WHERE id = ?`, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("offer.Delete: %w", err)
+        }</span>
+        <span class="cov8" title="1">rows, err := result.RowsAffected()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("offer.Delete rowsAffected: %w", err)
+        }</span>
+        <span class="cov8" title="1">if rows == 0 </span><span class="cov8" title="1">{
+                return fmt.Errorf("service %d: %w", id, apperrors.ErrNotFound)
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package offer
+
+import (
+        "context"
+        "fmt"
+        "strings"
+
+        "github.com/jadechy/barterswap/internal/apperrors"
+        "github.com/jadechy/barterswap/internal/user"
+)
+
+type Service struct {
+        repo     Repository
+        userRepo user.Repository
+}
+
+func NewService(repo Repository, userRepo user.Repository) *Service <span class="cov8" title="1">{
+        return &amp;Service{repo: repo, userRepo: userRepo}
+}</span>
+
+func (s *Service) Create(ctx context.Context, o *Offer) error <span class="cov8" title="1">{
+        if strings.TrimSpace(o.Titre) == "" </span><span class="cov8" title="1">{
+                return apperrors.ValidationError{Champ: "titre", Message: "le titre est requis"}
+        }</span>
+        <span class="cov8" title="1">if !contains(CategoriesValides, o.Categorie) </span><span class="cov8" title="1">{
+                return apperrors.ValidationError{Champ: "categorie", Message: fmt.Sprintf("catégorie invalide %q", o.Categorie)}
+        }</span>
+        <span class="cov8" title="1">if o.Credits &lt;= 0 </span><span class="cov8" title="1">{
+                return apperrors.ValidationError{
+                        Champ:   "credits",
+                        Message: fmt.Sprintf("le coût en crédits doit être positif, reçu : %d", o.Credits),
+                }
+
+        }</span>
+
+        <span class="cov8" title="1">skills, err := s.userRepo.GetSkills(ctx, o.ProviderID)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">hasSkill := false
+        for _, sk := range skills </span><span class="cov8" title="1">{
+                if strings.EqualFold(sk.Nom, o.Categorie) </span><span class="cov8" title="1">{
+                        hasSkill = true
+                        break</span>
+                }
+        }
+        <span class="cov8" title="1">if !hasSkill </span><span class="cov8" title="1">{
+                return apperrors.ValidationError{
+                        Champ:   "categorie",
+                        Message: fmt.Sprintf("vous n'avez pas la compétence %q", o.Categorie),
+                }
+        }</span>
+
+        <span class="cov8" title="1">return s.repo.Create(ctx, o)</span>
+}
+
+func (s *Service) GetByID(ctx context.Context, id int) (Offer, error) <span class="cov8" title="1">{
+        return s.repo.GetByID(ctx, id)
+}</span>
+
+func (s *Service) List(ctx context.Context, f ListFilter) ([]Offer, error) <span class="cov8" title="1">{
+        return s.repo.List(ctx, f)
+}</span>
+
+func (s *Service) Update(ctx context.Context, id int, o *Offer) error <span class="cov8" title="1">{
+        if !contains(CategoriesValides, o.Categorie) </span><span class="cov8" title="1">{
+                return apperrors.ValidationError{
+                        Champ:   "categorie",
+                        Message: fmt.Sprintf("catégorie invalide %q", o.Categorie),
+                }
+        }</span>
+        <span class="cov0" title="0">return s.repo.Update(ctx, id, o)</span>
+}
+
+func (s *Service) Delete(ctx context.Context, id int) error <span class="cov8" title="1">{
+        return s.repo.Delete(ctx, id)
+}</span>
+
+func contains(slice []string, value string) bool <span class="cov8" title="1">{
+        for _, v := range slice </span><span class="cov8" title="1">{
+                if strings.EqualFold(v, value) </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+        }
+        <span class="cov8" title="1">return false</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package review
+
+import (
+        "encoding/json"
+        "net/http"
+        "strconv"
+
+        "github.com/jadechy/barterswap/internal/httpx"
+)
+
+type Handler struct {
+        service *Service
+}
+
+func NewHandler(service *Service) *Handler <span class="cov8" title="1">{
+        return &amp;Handler{service: service}
+}</span>
+
+func currentUserID(r *http.Request) (int, error) <span class="cov8" title="1">{
+        return strconv.Atoi(r.Header.Get("X-UserID"))
+}</span>
+
+// Create godoc
+// @Summary      Laisser un avis sur un échange terminé
+// @Tags         reviews
+// @Security     UserIDAuth
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "ID de l'échange"
+// @Param        review body object true "Note et commentaire"
+// @Success      201 {object} Review
+// @Failure      400 {object} map[string]string
+// @Router       /exchanges/{id}/review [post]
+func (h *Handler) Create(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        exchangeID, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">userID, err := currentUserID(r)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusUnauthorized, map[string]string{"error": "X-UserID requis"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">var body struct {
+                Note        int    `json:"note"`
+                Commentaire string `json:"commentaire"`
+        }
+        if err := json.NewDecoder(r.Body).Decode(&amp;body); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">rev := Review{
+                ExchangeID:  exchangeID,
+                AuthorID:    userID,
+                Note:        body.Note,
+                Commentaire: body.Commentaire,
+        }
+
+        if err := h.service.Create(r.Context(), &amp;rev); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusCreated, rev)</span>
+}
+
+// GetByUserID godoc
+// @Summary      Avis reçus par un utilisateur
+// @Tags         reviews
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        id path int true "ID utilisateur"
+// @Success      200 {array} Review
+// @Router       /users/{id}/reviews [get]
+func (h *Handler) GetByUserID(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">reviews, err := h.service.GetByUserID(r.Context(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, reviews)</span>
+}
+
+// GetByServiceID godoc
+// @Summary      Avis reçus sur une offre
+// @Tags         reviews
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        id path int true "ID de l'offre"
+// @Success      200 {array} Review
+// @Router       /services/{id}/reviews [get]
+func (h *Handler) GetByServiceID(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">reviews, err := h.service.GetByServiceID(r.Context(), id)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, reviews)</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package review
+
+import (
+        "context"
+        "database/sql"
+        "fmt"
+        "log"
+)
+
+type Repository interface {
+        Create(ctx context.Context, r *Review) error
+        GetByUserID(ctx context.Context, userID int) ([]Review, error)
+        GetByServiceID(ctx context.Context, serviceID int) ([]Review, error)
+        HasReviewed(ctx context.Context, exchangeID, authorID int) (bool, error)
+}
+
+type sqlRepository struct {
+        db *sql.DB
+}
+
+func NewRepository(db *sql.DB) Repository <span class="cov8" title="1">{
+        return &amp;sqlRepository{db: db}
+}</span>
+
+func (r *sqlRepository) Create(ctx context.Context, rev *Review) error <span class="cov8" title="1">{
+        result, err := r.db.ExecContext(ctx, `
+                INSERT INTO reviews (exchange_id, author_id, target_id, note, commentaire)
+                VALUES (?, ?, ?, ?, ?)`,
+                rev.ExchangeID, rev.AuthorID, rev.TargetID, rev.Note, rev.Commentaire)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("review.Create: %w", err)
+        }</span>
+        <span class="cov8" title="1">id, err := result.LastInsertId()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("review.Create lastInsertId: %w", err)
+        }</span>
+        <span class="cov8" title="1">rev.ID = int(id)
+        return nil</span>
+}
+func (r *sqlRepository) GetByUserID(ctx context.Context, userID int) ([]Review, error) <span class="cov8" title="1">{
+        rows, err := r.db.QueryContext(ctx, `
+                SELECT id, exchange_id, author_id, target_id, note, commentaire, created_at
+                FROM reviews WHERE target_id = ?`, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("review.GetByUserID: %w", err)
+        }</span>
+        <span class="cov8" title="1">defer func() </span><span class="cov8" title="1">{
+                if cerr := rows.Close(); cerr != nil </span><span class="cov0" title="0">{
+                        log.Printf("review.GetByUserID: erreur fermeture rows: %v", cerr)
+                }</span>
+        }()
+        <span class="cov8" title="1">return scanReviews(rows)</span>
+}
+
+func (r *sqlRepository) GetByServiceID(ctx context.Context, serviceID int) ([]Review, error) <span class="cov8" title="1">{
+        rows, err := r.db.QueryContext(ctx, `
+                SELECT r.id, r.exchange_id, r.author_id, r.target_id, r.note, r.commentaire, r.created_at
+                FROM reviews r
+                JOIN exchanges e ON r.exchange_id = e.id
+                WHERE e.service_id = ?`, serviceID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("review.GetByServiceID: %w", err)
+        }</span>
+        <span class="cov8" title="1">defer func() </span><span class="cov8" title="1">{
+                if cerr := rows.Close(); cerr != nil </span><span class="cov0" title="0">{
+                        log.Printf("review.GetByServiceID: erreur fermeture rows: %v", cerr)
+                }</span>
+        }()
+        <span class="cov8" title="1">return scanReviews(rows)</span>
+}
+
+func (r *sqlRepository) HasReviewed(ctx context.Context, exchangeID, authorID int) (bool, error) <span class="cov8" title="1">{
+        var count int
+        err := r.db.QueryRowContext(ctx, `
+                SELECT COUNT(*) FROM reviews
+                WHERE exchange_id = ? AND author_id = ?`, exchangeID, authorID).Scan(&amp;count)
+        if err != nil </span><span class="cov0" title="0">{
+                return false, fmt.Errorf("review.HasReviewed: %w", err)
+        }</span>
+        <span class="cov8" title="1">return count &gt; 0, nil</span>
+}
+
+func scanReviews(rows *sql.Rows) ([]Review, error) <span class="cov8" title="1">{
+        var reviews []Review
+        for rows.Next() </span><span class="cov8" title="1">{
+                var r Review
+                if err := rows.Scan(&amp;r.ID, &amp;r.ExchangeID, &amp;r.AuthorID, &amp;r.TargetID,
+                        &amp;r.Note, &amp;r.Commentaire, &amp;r.CreatedAt); err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("review scan: %w", err)
+                }</span>
+                <span class="cov8" title="1">reviews = append(reviews, r)</span>
+        }
+        <span class="cov8" title="1">return reviews, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package review
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/jadechy/barterswap/internal/apperrors"
+        "github.com/jadechy/barterswap/internal/exchange"
+)
+
+// ExchangeGetter est le sous-ensemble de exchange.Repository dont review a besoin.
+// Définie ici (côté consommateur) plutôt que dans exchange, pour éviter un couplage
+// plus large que nécessaire — review n'a besoin que de lire un échange par ID.
+type ExchangeGetter interface {
+        GetByID(ctx context.Context, id int) (exchange.Exchange, error)
+}
+
+type Service struct {
+        repo         Repository
+        exchangeRepo ExchangeGetter
+}
+
+func NewService(repo Repository, exchangeRepo ExchangeGetter) *Service <span class="cov8" title="1">{
+        return &amp;Service{repo: repo, exchangeRepo: exchangeRepo}
+}</span>
+
+func (s *Service) Create(ctx context.Context, r *Review) error <span class="cov8" title="1">{
+        if r.Note &lt; 1 || r.Note &gt; 5 </span><span class="cov8" title="1">{
+                return apperrors.ValidationError{
+                        Champ:   "note",
+                        Message: fmt.Sprintf("la note doit être entre 1 et 5, reçu : %d", r.Note),
+                }
+        }</span>
+
+        <span class="cov8" title="1">e, err := s.exchangeRepo.GetByID(ctx, r.ExchangeID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if e.Status != "completed" </span><span class="cov8" title="1">{
+                return fmt.Errorf("l'échange doit être terminé pour être noté: %w", apperrors.ErrExchangeNotDone)
+        }</span>
+
+        <span class="cov8" title="1">if e.OwnerID != r.AuthorID &amp;&amp; e.RequesterID != r.AuthorID </span><span class="cov8" title="1">{
+                return fmt.Errorf("vous ne faites pas partie de cet échange: %w", apperrors.ErrUnauthorized)
+        }</span>
+
+        <span class="cov8" title="1">already, err := s.repo.HasReviewed(ctx, r.ExchangeID, r.AuthorID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if already </span><span class="cov8" title="1">{
+                return fmt.Errorf("vous avez déjà noté cet échange: %w", apperrors.ErrAlreadyReviewed)
+        }</span>
+
+        <span class="cov8" title="1">if r.AuthorID == e.OwnerID </span><span class="cov0" title="0">{
+                r.TargetID = e.RequesterID
+        }</span> else<span class="cov8" title="1"> {
+                r.TargetID = e.OwnerID
+        }</span>
+
+        <span class="cov8" title="1">return s.repo.Create(ctx, r)</span>
+}
+
+func (s *Service) GetByUserID(ctx context.Context, userID int) ([]Review, error) <span class="cov8" title="1">{
+        return s.repo.GetByUserID(ctx, userID)
+}</span>
+
+func (s *Service) GetByServiceID(ctx context.Context, serviceID int) ([]Review, error) <span class="cov8" title="1">{
+        return s.repo.GetByServiceID(ctx, serviceID)
+}</span>
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package user
+
+import (
+        "encoding/json"
+        "net/http"
+        "strconv"
+
+        "github.com/jadechy/barterswap/internal/httpx"
+)
+
+type Handler struct {
+        service *Service
+}
+
+func NewHandler(service *Service) *Handler <span class="cov8" title="1">{
+        return &amp;Handler{service: service}
+}</span>
+
+// Create godoc
+// @Summary      Créer un utilisateur
+// @Tags         users
+// @Security     UserIDAuth
+// @Accept       json
+// @Produce      json
+// @Param        user body User true "Utilisateur à créer"
+// @Success      201 {object} User
+// @Failure      400 {object} map[string]string
+// @Router       /users [post]
+func (h *Handler) Create(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var u User
+        if err := json.NewDecoder(r.Body).Decode(&amp;u); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">if err := h.service.Create(r.Context(), &amp;u); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusCreated, u)</span>
+}
+
+// GetByID godoc
+// @Summary      Récupérer un utilisateur par ID
+// @Tags         users
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        id path int true "ID utilisateur"
+// @Success      200 {object} User
+// @Failure      404 {object} map[string]string
+// @Router       /users/{id} [get]
+func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">u, err := h.service.GetByID(r.Context(), id)
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, u)</span>
+}
+
+// Update godoc
+// @Summary      Mettre à jour un utilisateur
+// @Tags         users
+// @Security     UserIDAuth
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "ID utilisateur"
+// @Param        user body User true "Données à mettre à jour"
+// @Success      200 {object} User
+// @Failure      400 {object} map[string]string
+// @Router       /users/{id} [put]
+func (h *Handler) Update(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">var u User
+        if err := json.NewDecoder(r.Body).Decode(&amp;u); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">if err := h.service.Update(r.Context(), id, &amp;u); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, u)</span>
+}
+
+// GetSkills godoc
+// @Summary      Lister les compétences d'un utilisateur
+// @Tags         users
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        id path int true "ID utilisateur"
+// @Success      200 {array} Skill
+// @Router       /users/{id}/skills [get]
+func (h *Handler) GetSkills(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">skills, err := h.service.GetSkills(r.Context(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, skills)</span>
+}
+
+// SetSkills godoc
+// @Summary      Remplacer les compétences d'un utilisateur
+// @Tags         users
+// @Security     UserIDAuth
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "ID utilisateur"
+// @Param        skills body []Skill true "Nouvelle liste de compétences"
+// @Success      200 {array} Skill
+// @Failure      400 {object} map[string]string
+// @Router       /users/{id}/skills [put]
+func (h *Handler) SetSkills(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">var skills []Skill
+        if err := json.NewDecoder(r.Body).Decode(&amp;skills); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">if err := h.service.SetSkills(r.Context(), id, skills); err != nil </span><span class="cov8" title="1">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, skills)</span>
+}
+
+// GetStats godoc
+// @Summary      Statistiques d'un utilisateur
+// @Security     UserIDAuth
+// @Tags         users
+// @Produce      json
+// @Param        id path int true "ID utilisateur"
+// @Success      200 {object} Stats
+// @Router       /users/{id}/stats [get]
+func (h *Handler) GetStats(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id, err := strconv.Atoi(r.PathValue("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
+                return
+        }</span>
+        <span class="cov8" title="1">stats, err := h.service.Stats(r.Context(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                httpx.WriteError(w, err)
+                return
+        }</span>
+        <span class="cov8" title="1">httpx.WriteJSON(w, http.StatusOK, stats)</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package user
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+        "fmt"
+        "log"
+
+        "github.com/jadechy/barterswap/internal/apperrors"
+        "github.com/jadechy/barterswap/internal/dbx"
+)
+
+// Repository expose tout ce dont les autres domaines ont besoin de user
+// (ex: offer.Service utilise GetSkills pour valider une création d'offre).
+type Repository interface {
+        GetByID(ctx context.Context, id int) (User, error)
+        Create(ctx context.Context, u *User) error
+        Update(ctx context.Context, id int, u *User) error
+        GetSkills(ctx context.Context, userID int) ([]Skill, error)
+        SetSkills(ctx context.Context, userID int, skills []Skill) error
+        Stats(ctx context.Context, userID int) (Stats, error)
+        AddCreditTransaction(ctx context.Context, q dbx.Querier, userID int, exchangeID *int, montant int, typ string) error
+}
+
+type sqlRepository struct {
+        db *sql.DB
+}
+
+func NewRepository(db *sql.DB) Repository <span class="cov8" title="1">{
+        return &amp;sqlRepository{db: db}
+}</span>
+
+func (r *sqlRepository) GetByID(ctx context.Context, id int) (User, error) <span class="cov8" title="1">{
+        var u User
+        row := r.db.QueryRowContext(ctx, `
+                SELECT id, pseudo, bio, ville, credit_balance, created_at
+                FROM users WHERE id = ?`, id)
+
+        err := row.Scan(&amp;u.ID, &amp;u.Pseudo, &amp;u.Bio, &amp;u.Ville, &amp;u.CreditBalance, &amp;u.CreatedAt)
+        if err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                return u, fmt.Errorf("utilisateur %d: %w", id, apperrors.ErrNotFound)
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return u, fmt.Errorf("user.GetByID: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">skills, err := r.GetSkills(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return u, err
+        }</span>
+        <span class="cov8" title="1">u.Skills = skills
+
+        return u, nil</span>
+}
+
+func (r *sqlRepository) Create(ctx context.Context, u *User) error <span class="cov0" title="0">{
+        tx, err := r.db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.Create begin: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer func() </span><span class="cov0" title="0">{
+                if rerr := tx.Rollback(); rerr != nil &amp;&amp; !errors.Is(rerr, sql.ErrTxDone) </span><span class="cov0" title="0">{
+                        log.Printf("user.Create: erreur rollback: %v", rerr)
+                }</span>
+        }()
+
+        <span class="cov0" title="0">result, err := tx.ExecContext(ctx, `
+                INSERT INTO users (pseudo, bio, ville, credit_balance)
+                VALUES (?, ?, ?, 10)`, u.Pseudo, u.Bio, u.Ville)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.Create insert: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">id, err := result.LastInsertId()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.Create lastInsertId: %w", err)
+        }</span>
+        <span class="cov0" title="0">u.ID = int(id)
+
+        _, err = tx.ExecContext(ctx, `
+                INSERT INTO credit_transactions (user_id, exchange_id, montant, type)
+                VALUES (?, NULL, 10, 'welcome')`, u.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.Create welcome credits: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return tx.Commit()</span>
+}
+
+func (r *sqlRepository) Update(ctx context.Context, id int, u *User) error <span class="cov8" title="1">{
+        result, err := r.db.ExecContext(ctx, `
+                UPDATE users SET pseudo = ?, bio = ?, ville = ?
+                WHERE id = ?`, u.Pseudo, u.Bio, u.Ville, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.Update: %w", err)
+        }</span>
+        <span class="cov8" title="1">rows, err := result.RowsAffected()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.Update rowsAffected: %w", err)
+        }</span>
+        <span class="cov8" title="1">if rows == 0 </span><span class="cov8" title="1">{
+                return fmt.Errorf("utilisateur %d: %w", id, apperrors.ErrNotFound)
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (r *sqlRepository) GetSkills(ctx context.Context, userID int) ([]Skill, error) <span class="cov8" title="1">{
+        rows, err := r.db.QueryContext(ctx, `
+                SELECT nom, niveau FROM skills WHERE user_id = ?`, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("user.GetSkills: %w", err)
+        }</span>
+        <span class="cov8" title="1">defer func() </span><span class="cov8" title="1">{
+                if cerr := rows.Close(); cerr != nil </span><span class="cov0" title="0">{
+                        log.Printf("user.GetSkills: erreur fermeture rows: %v", cerr)
+                }</span>
+        }()
+
+        <span class="cov8" title="1">var skills []Skill
+        for rows.Next() </span><span class="cov8" title="1">{
+                var s Skill
+                if err := rows.Scan(&amp;s.Nom, &amp;s.Niveau); err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("user.GetSkills scan: %w", err)
+                }</span>
+                <span class="cov8" title="1">skills = append(skills, s)</span>
+        }
+        <span class="cov8" title="1">if err := rows.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("user.GetSkills rows: %w", err)
+        }</span>
+        <span class="cov8" title="1">return skills, nil</span>
+}
+func (r *sqlRepository) SetSkills(ctx context.Context, userID int, skills []Skill) error <span class="cov0" title="0">{
+        tx, err := r.db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.SetSkills begin: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer func() </span><span class="cov0" title="0">{
+                if rerr := tx.Rollback(); rerr != nil &amp;&amp; !errors.Is(rerr, sql.ErrTxDone) </span><span class="cov0" title="0">{
+                        log.Printf("user.SetSkills: erreur rollback: %v", rerr)
+                }</span>
+        }()
+
+        <span class="cov0" title="0">_, err = tx.ExecContext(ctx, `DELETE FROM skills WHERE user_id = ?`, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.SetSkills delete: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">for _, s := range skills </span><span class="cov0" title="0">{
+                _, err = tx.ExecContext(ctx, `
+                        INSERT INTO skills (user_id, nom, niveau)
+                        VALUES (?, ?, ?)`, userID, s.Nom, s.Niveau)
+                if err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("user.SetSkills insert: %w", err)
+                }</span>
+        }
+
+        <span class="cov0" title="0">return tx.Commit()</span>
+}
+
+func (r *sqlRepository) Stats(ctx context.Context, userID int) (Stats, error) <span class="cov0" title="0">{
+        var s Stats
+        s.UserID = userID
+
+        err := r.db.QueryRowContext(ctx, `
+                SELECT
+                        (SELECT COUNT(*) FROM services WHERE provider_id = ? AND actif = true),
+                        (SELECT COUNT(*) FROM exchanges WHERE (requester_id = ? OR owner_id = ?) AND status = 'completed'),
+                        (SELECT credit_balance FROM users WHERE id = ?),
+                        (SELECT COALESCE(AVG(note), 0) FROM reviews WHERE target_id = ?),
+                        (SELECT COUNT(*) FROM reviews WHERE target_id = ?),
+                        (SELECT COALESCE(SUM(montant), 0) FROM credit_transactions WHERE user_id = ? AND montant &gt; 0),
+                        (SELECT COALESCE(SUM(ABS(montant)), 0) FROM credit_transactions WHERE user_id = ? AND montant &lt; 0)
+                `,
+                userID, userID, userID, userID, userID, userID, userID, userID,
+        ).Scan(
+                &amp;s.ServicesActifs,
+                &amp;s.EchangesCompletes,
+                &amp;s.CreditBalance,
+                &amp;s.NoteMoyenne,
+                &amp;s.NbAvis,
+                &amp;s.TotalGagne,
+                &amp;s.TotalDepense,
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                return s, fmt.Errorf("user.Stats: %w", err)
+        }</span>
+        <span class="cov0" title="0">return s, nil</span>
+}
+
+func (r *sqlRepository) AddCreditTransaction(ctx context.Context, q dbx.Querier, userID int, exchangeID *int, montant int, typ string) error <span class="cov0" title="0">{
+        _, err := q.ExecContext(ctx, `
+                INSERT INTO credit_transactions (user_id, exchange_id, montant, type)
+                VALUES (?, ?, ?, ?)`, userID, exchangeID, montant, typ)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.AddCreditTransaction insert: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">_, err = q.ExecContext(ctx, `
+                UPDATE users SET credit_balance = credit_balance + ? WHERE id = ?`, montant, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("user.AddCreditTransaction update balance: %w", err)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package user
+
+import (
+        "context"
+        "fmt"
+        "strings"
+
+        "github.com/jadechy/barterswap/internal/apperrors"
+)
+
+type Service struct {
+        repo Repository
+}
+
+func NewService(repo Repository) *Service <span class="cov8" title="1">{
+        return &amp;Service{repo: repo}
+}</span>
+
+func (s *Service) Create(ctx context.Context, u *User) error <span class="cov8" title="1">{
+        if strings.TrimSpace(u.Pseudo) == "" </span><span class="cov8" title="1">{
+                return apperrors.ValidationError{Champ: "pseudo", Message: "le pseudo est requis"}
+        }</span>
+        <span class="cov8" title="1">return s.repo.Create(ctx, u)</span>
+}
+
+func (s *Service) GetByID(ctx context.Context, id int) (User, error) <span class="cov8" title="1">{
+        return s.repo.GetByID(ctx, id)
+}</span>
+
+func (s *Service) Update(ctx context.Context, id int, u *User) error <span class="cov8" title="1">{
+        if strings.TrimSpace(u.Pseudo) == "" </span><span class="cov8" title="1">{
+                return apperrors.ValidationError{Champ: "pseudo", Message: "le pseudo est requis"}
+        }</span>
+        <span class="cov8" title="1">return s.repo.Update(ctx, id, u)</span>
+}
+
+func (s *Service) GetSkills(ctx context.Context, userID int) ([]Skill, error) <span class="cov8" title="1">{
+        return s.repo.GetSkills(ctx, userID)
+}</span>
+
+func (s *Service) SetSkills(ctx context.Context, userID int, skills []Skill) error <span class="cov8" title="1">{
+        for _, sk := range skills </span><span class="cov8" title="1">{
+                if !contains(NiveauxValides, sk.Niveau) </span><span class="cov8" title="1">{
+                        return apperrors.ValidationError{
+                                Champ:   "niveau",
+                                Message: fmt.Sprintf("niveau invalide %q", sk.Niveau),
+                        }
+                }</span>
+                <span class="cov8" title="1">if strings.TrimSpace(sk.Nom) == "" </span><span class="cov8" title="1">{
+                        return apperrors.ValidationError{Champ: "nom", Message: "le nom de la compétence est requis"}
+                }</span>
+        }
+        <span class="cov8" title="1">return s.repo.SetSkills(ctx, userID, skills)</span>
+}
+
+func (s *Service) Stats(ctx context.Context, userID int) (Stats, error) <span class="cov8" title="1">{
+        return s.repo.Stats(ctx, userID)
+}</span>
+
+func contains(slice []string, value string) bool <span class="cov8" title="1">{
+        for _, v := range slice </span><span class="cov8" title="1">{
+                if strings.EqualFold(v, value) </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+        }
+        <span class="cov8" title="1">return false</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

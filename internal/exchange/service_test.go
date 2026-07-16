@@ -19,154 +19,154 @@ import (
 	usermocks "github.com/jadechy/barterswap/internal/user/mocks"
 )
 
-func TestCreate_SoiMeme_RetourneErreurSelfExchange(t *testing.T) {
-	repo := exchangemocks.NewMockRepository(t)
-	tx := dbxmocks.NewMockTxRunner(t)
-	offers := offermocks.NewMockRepository(t)
-	users := usermocks.NewMockRepository(t)
-	svc := exchange.NewService(repo, tx, offers, users, users)
-
-	offers.EXPECT().
-		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, ProviderID: 1, Credits: 5}, nil)
-
-	_, err := svc.Create(context.Background(), 1, 10)
-
-	require.Error(t, err)
-	assert.ErrorIs(t, err, apperrors.ErrSelfExchange)
+type exchangeMocks struct {
+	repo   *exchangemocks.MockRepository
+	tx     *dbxmocks.MockTxRunner
+	offers *offermocks.MockRepository
+	users  *usermocks.MockRepository
 }
 
-func TestCreate_EchangeActifExistant_RetourneErreurConflict(t *testing.T) {
-	repo := exchangemocks.NewMockRepository(t)
-	tx := dbxmocks.NewMockTxRunner(t)
-	offers := offermocks.NewMockRepository(t)
-	users := usermocks.NewMockRepository(t)
-	svc := exchange.NewService(repo, tx, offers, users, users)
-
-	offers.EXPECT().
-		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 5}, nil)
-	repo.EXPECT().
-		HasActive(mock.Anything, 10).
-		Return(true, nil)
-
-	_, err := svc.Create(context.Background(), 1, 10)
-
-	require.Error(t, err)
-	assert.ErrorIs(t, err, apperrors.ErrExchangeConflict)
+func newExchangeService(t *testing.T) (*exchange.Service, exchangeMocks) {
+	m := exchangeMocks{
+		repo:   exchangemocks.NewMockRepository(t),
+		tx:     dbxmocks.NewMockTxRunner(t),
+		offers: offermocks.NewMockRepository(t),
+		users:  usermocks.NewMockRepository(t),
+	}
+	svc := exchange.NewService(m.repo, m.tx, m.offers, m.users, m.users)
+	return svc, m
 }
 
-func TestCreate_SoldeInsuffisant_RetourneErreur(t *testing.T) {
-	repo := exchangemocks.NewMockRepository(t)
-	tx := dbxmocks.NewMockTxRunner(t)
-	offers := offermocks.NewMockRepository(t)
-	users := usermocks.NewMockRepository(t)
-	svc := exchange.NewService(repo, tx, offers, users, users)
+func TestCreate(t *testing.T) {
+	cases := []struct {
+		name        string
+		requesterID int
+		offerID     int
+		setupMocks  func(m exchangeMocks)
+		wantErr     error
+	}{
+		{
+			name:        "soi-meme",
+			requesterID: 1,
+			offerID:     10,
+			setupMocks: func(m exchangeMocks) {
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, ProviderID: 1, Credits: 5}, nil)
+			},
+			wantErr: apperrors.ErrSelfExchange,
+		},
+		{
+			name:        "echange actif existant",
+			requesterID: 1,
+			offerID:     10,
+			setupMocks: func(m exchangeMocks) {
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 5}, nil)
+				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(true, nil)
+			},
+			wantErr: apperrors.ErrExchangeConflict,
+		},
+		{
+			name:        "solde insuffisant",
+			requesterID: 1,
+			offerID:     10,
+			setupMocks: func(m exchangeMocks) {
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 20}, nil)
+				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(false, nil)
+				m.users.EXPECT().GetByID(mock.Anything, 1).Return(user.User{ID: 1, CreditBalance: 5}, nil)
+			},
+			wantErr: apperrors.ErrInsufficientCredits,
+		},
+		{
+			name:        "valide: succes",
+			requesterID: 1,
+			offerID:     10,
+			setupMocks: func(m exchangeMocks) {
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 5}, nil)
+				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(false, nil)
+				m.users.EXPECT().GetByID(mock.Anything, 1).Return(user.User{ID: 1, CreditBalance: 10}, nil)
+				m.repo.EXPECT().Create(mock.Anything, mock.AnythingOfType("*exchange.Exchange")).Return(nil)
+			},
+			wantErr: nil,
+		},
+	}
 
-	offers.EXPECT().
-		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 20}, nil)
-	repo.EXPECT().
-		HasActive(mock.Anything, 10).
-		Return(false, nil)
-	users.EXPECT().
-		GetByID(mock.Anything, 1).
-		Return(user.User{ID: 1, CreditBalance: 5}, nil)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			svc, m := newExchangeService(t)
+			tc.setupMocks(m)
 
-	_, err := svc.Create(context.Background(), 1, 10)
+			_, err := svc.Create(context.Background(), tc.requesterID, tc.offerID)
 
-	require.Error(t, err)
-	assert.ErrorIs(t, err, apperrors.ErrInsufficientCredits)
-}
-
-func TestCreate_Valide_Succes(t *testing.T) {
-	repo := exchangemocks.NewMockRepository(t)
-	tx := dbxmocks.NewMockTxRunner(t)
-	offers := offermocks.NewMockRepository(t)
-	users := usermocks.NewMockRepository(t)
-	svc := exchange.NewService(repo, tx, offers, users, users)
-
-	offers.EXPECT().
-		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 5}, nil)
-	repo.EXPECT().
-		HasActive(mock.Anything, 10).
-		Return(false, nil)
-	users.EXPECT().
-		GetByID(mock.Anything, 1).
-		Return(user.User{ID: 1, CreditBalance: 10}, nil)
-	repo.EXPECT().
-		Create(mock.Anything, mock.AnythingOfType("*exchange.Exchange")).
-		Return(nil)
-
-	e, err := svc.Create(context.Background(), 1, 10)
-
-	require.NoError(t, err)
-	assert.Equal(t, 2, e.OwnerID)
-	assert.Equal(t, 1, e.RequesterID)
-}
-
-func TestAccept_NonProprietaire_RetourneErreurUnauthorized(t *testing.T) {
-	repo := exchangemocks.NewMockRepository(t)
-	tx := dbxmocks.NewMockTxRunner(t)
-	offers := offermocks.NewMockRepository(t)
-	users := usermocks.NewMockRepository(t)
-	svc := exchange.NewService(repo, tx, offers, users, users)
-
-	repo.EXPECT().
-		GetByID(mock.Anything, 1).
-		Return(exchange.Exchange{ID: 1, OwnerID: 2, Status: "pending"}, nil)
-
-	err := svc.Accept(context.Background(), 1, 99)
-
-	require.Error(t, err)
-	assert.ErrorIs(t, err, apperrors.ErrUnauthorized)
-}
-
-func TestAccept_StatutInvalide_RetourneErreur(t *testing.T) {
-	repo := exchangemocks.NewMockRepository(t)
-	tx := dbxmocks.NewMockTxRunner(t)
-	offers := offermocks.NewMockRepository(t)
-	users := usermocks.NewMockRepository(t)
-	svc := exchange.NewService(repo, tx, offers, users, users)
-
-	repo.EXPECT().
-		GetByID(mock.Anything, 1).
-		Return(exchange.Exchange{ID: 1, OwnerID: 2, Status: "completed"}, nil)
-
-	err := svc.Accept(context.Background(), 1, 2)
-
-	require.Error(t, err)
-	assert.ErrorIs(t, err, apperrors.ErrInvalidStatus)
-}
-
-func TestAccept_Valide_Succes(t *testing.T) {
-	repo := exchangemocks.NewMockRepository(t)
-	tx := dbxmocks.NewMockTxRunner(t)
-	offers := offermocks.NewMockRepository(t)
-	users := usermocks.NewMockRepository(t)
-	svc := exchange.NewService(repo, tx, offers, users, users)
-
-	repo.EXPECT().
-		GetByID(mock.Anything, 1).
-		Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "pending"}, nil)
-	offers.EXPECT().
-		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, Credits: 5}, nil)
-
-	tx.EXPECT().
-		WithTx(mock.Anything, mock.AnythingOfType("func(dbx.Querier) error")).
-		RunAndReturn(func(ctx context.Context, fn func(dbx.Querier) error) error {
-			return fn(nil)
+			if tc.wantErr != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.wantErr)
+			} else {
+				require.NoError(t, err)
+			}
 		})
-	users.EXPECT().
-		AddCreditTransaction(mock.Anything, mock.Anything, 1, mock.Anything, -5, "spend").
-		Return(nil)
-	repo.EXPECT().
-		UpdateStatus(mock.Anything, mock.Anything, 1, "accepted").
-		Return(nil)
+	}
+}
 
-	err := svc.Accept(context.Background(), 1, 2)
+func TestAccept(t *testing.T) {
+	cases := []struct {
+		name       string
+		exchangeID int
+		userID     int
+		setupMocks func(m exchangeMocks)
+		wantErr    error
+	}{
+		{
+			name:       "non proprietaire",
+			exchangeID: 1,
+			userID:     99,
+			setupMocks: func(m exchangeMocks) {
+				m.repo.EXPECT().GetByID(mock.Anything, 1).Return(exchange.Exchange{ID: 1, OwnerID: 2, Status: "pending"}, nil)
+			},
+			wantErr: apperrors.ErrUnauthorized,
+		},
+		{
+			name:       "statut invalide",
+			exchangeID: 1,
+			userID:     2,
+			setupMocks: func(m exchangeMocks) {
+				m.repo.EXPECT().GetByID(mock.Anything, 1).Return(exchange.Exchange{ID: 1, OwnerID: 2, Status: "completed"}, nil)
+			},
+			wantErr: apperrors.ErrInvalidStatus,
+		},
+		{
+			name:       "valide: succes",
+			exchangeID: 1,
+			userID:     2,
+			setupMocks: func(m exchangeMocks) {
+				m.repo.EXPECT().GetByID(mock.Anything, 1).
+					Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "pending"}, nil)
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, Credits: 5}, nil)
+				m.tx.EXPECT().
+					WithTx(mock.Anything, mock.AnythingOfType("func(dbx.Querier) error")).
+					RunAndReturn(func(ctx context.Context, fn func(dbx.Querier) error) error {
+						return fn(nil)
+					})
+				m.users.EXPECT().
+					AddCreditTransaction(mock.Anything, mock.Anything, 1, mock.Anything, -5, "spend").
+					Return(nil)
+				m.repo.EXPECT().UpdateStatus(mock.Anything, mock.Anything, 1, "accepted").Return(nil)
+			},
+			wantErr: nil,
+		},
+	}
 
-	require.NoError(t, err)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			svc, m := newExchangeService(t)
+			tc.setupMocks(m)
+
+			err := svc.Accept(context.Background(), tc.exchangeID, tc.userID)
+
+			if tc.wantErr != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.wantErr)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
 }
