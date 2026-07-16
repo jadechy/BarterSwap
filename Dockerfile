@@ -1,4 +1,4 @@
-FROM golang:1.23
+FROM golang:1.26
 
 # Client mysql nécessaire pour appliquer schema.sql/seeds.sql automatiquement
 RUN apt-get update && apt-get install -y --no-install-recommends default-mysql-client \
