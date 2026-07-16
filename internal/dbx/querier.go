@@ -14,7 +14,9 @@ type Querier interface {
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
 }
-
+type TxRunner interface {
+	WithTx(ctx context.Context, fn func(q Querier) error) error
+}
 type TxManager struct {
 	db *sql.DB
 }

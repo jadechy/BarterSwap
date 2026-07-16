@@ -29,13 +29,13 @@ type UserAccess interface {
 
 type Service struct {
 	repo      Repository
-	txManager *dbx.TxManager
+	txManager dbx.TxRunner
 	offers    OfferGetter
 	users     UserGetter
 	credits   CreditLedger
 }
 
-func NewService(repo Repository, txManager *dbx.TxManager, offers OfferGetter, users UserAccess) *Service {
+func NewService(repo Repository, txManager dbx.TxRunner, offers OfferGetter, users UserAccess) *Service {
 	return &Service{repo: repo, txManager: txManager, offers: offers, users: users}
 }
 
