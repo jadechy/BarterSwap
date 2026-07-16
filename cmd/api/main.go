@@ -41,7 +41,7 @@ func main() {
 	offerHandler := offer.NewHandler(offerService)
 
 	exchangeRepo := exchange.NewRepository(db)
-	exchangeService := exchange.NewService(exchangeRepo, txManager, offerRepo, userRepo)
+	exchangeService := exchange.NewService(exchangeRepo, txManager, offerRepo, userRepo, userRepo)
 	exchangeHandler := exchange.NewHandler(exchangeService)
 
 	reviewRepo := review.NewRepository(db)

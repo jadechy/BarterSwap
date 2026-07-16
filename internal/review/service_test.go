@@ -10,11 +10,13 @@ import (
 
 	"github.com/jadechy/barterswap/internal/apperrors"
 	"github.com/jadechy/barterswap/internal/exchange"
+	exchangemocks "github.com/jadechy/barterswap/internal/exchange/mocks"
+	reviewmocks "github.com/jadechy/barterswap/internal/review/mocks"
 )
 
 func TestCreate_NoteHorsBornes_RetourneErreurValidation(t *testing.T) {
-	repo := NewMockRepository(t)
-	exchangeRepo := exchange.NewMockRepository(t)
+	repo := reviewmocks.NewMockRepository(t)
+	exchangeRepo := exchangemocks.NewMockRepository(t)
 	svc := NewService(repo, exchangeRepo)
 
 	r := &Review{ExchangeID: 1, AuthorID: 1, Note: 6}
@@ -25,8 +27,8 @@ func TestCreate_NoteHorsBornes_RetourneErreurValidation(t *testing.T) {
 }
 
 func TestCreate_EchangeNonTermine_RetourneErreur(t *testing.T) {
-	repo := NewMockRepository(t)
-	exchangeRepo := exchange.NewMockRepository(t)
+	repo := reviewmocks.NewMockRepository(t)
+	exchangeRepo := exchangemocks.NewMockRepository(t)
 	svc := NewService(repo, exchangeRepo)
 
 	r := &Review{ExchangeID: 1, AuthorID: 1, Note: 5}
@@ -42,8 +44,8 @@ func TestCreate_EchangeNonTermine_RetourneErreur(t *testing.T) {
 }
 
 func TestCreate_AuteurHorsEchange_RetourneErreurUnauthorized(t *testing.T) {
-	repo := NewMockRepository(t)
-	exchangeRepo := exchange.NewMockRepository(t)
+	repo := reviewmocks.NewMockRepository(t)
+	exchangeRepo := exchangemocks.NewMockRepository(t)
 	svc := NewService(repo, exchangeRepo)
 
 	r := &Review{ExchangeID: 1, AuthorID: 99, Note: 5}
@@ -59,8 +61,8 @@ func TestCreate_AuteurHorsEchange_RetourneErreurUnauthorized(t *testing.T) {
 }
 
 func TestCreate_DejaNote_RetourneErreur(t *testing.T) {
-	repo := NewMockRepository(t)
-	exchangeRepo := exchange.NewMockRepository(t)
+	repo := reviewmocks.NewMockRepository(t)
+	exchangeRepo := exchangemocks.NewMockRepository(t)
 	svc := NewService(repo, exchangeRepo)
 
 	r := &Review{ExchangeID: 1, AuthorID: 1, Note: 5}
@@ -79,8 +81,8 @@ func TestCreate_DejaNote_RetourneErreur(t *testing.T) {
 }
 
 func TestCreate_Valide_Succes(t *testing.T) {
-	repo := NewMockRepository(t)
-	exchangeRepo := exchange.NewMockRepository(t)
+	repo := reviewmocks.NewMockRepository(t)
+	exchangeRepo := exchangemocks.NewMockRepository(t)
 	svc := NewService(repo, exchangeRepo)
 
 	r := &Review{ExchangeID: 1, AuthorID: 1, Note: 5, Commentaire: "Top"}

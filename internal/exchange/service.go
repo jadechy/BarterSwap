@@ -22,11 +22,6 @@ type CreditLedger interface {
 	AddCreditTransaction(ctx context.Context, q dbx.Querier, userID int, exchangeID *int, montant int, typ string) error
 }
 
-type UserAccess interface {
-	GetByID(ctx context.Context, id int) (user.User, error)
-	AddCreditTransaction(ctx context.Context, q dbx.Querier, userID int, exchangeID *int, montant int, typ string) error
-}
-
 type Service struct {
 	repo      Repository
 	txManager dbx.TxRunner
@@ -35,8 +30,8 @@ type Service struct {
 	credits   CreditLedger
 }
 
-func NewService(repo Repository, txManager dbx.TxRunner, offers OfferGetter, users UserAccess) *Service {
-	return &Service{repo: repo, txManager: txManager, offers: offers, users: users}
+func NewService(repo Repository, txManager dbx.TxRunner, offers OfferGetter, users UserGetter, credits CreditLedger) *Service {
+	return &Service{repo: repo, txManager: txManager, offers: offers, users: users, credits: credits}
 }
 
 func (s *Service) Create(ctx context.Context, requesterID, offerID int) (Exchange, error) {

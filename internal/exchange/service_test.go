@@ -10,15 +10,19 @@ import (
 
 	"github.com/jadechy/barterswap/internal/apperrors"
 	"github.com/jadechy/barterswap/internal/dbx"
+	dbxmocks "github.com/jadechy/barterswap/internal/dbx/mocks"
+	exchangemocks "github.com/jadechy/barterswap/internal/exchange/mocks"
 	"github.com/jadechy/barterswap/internal/offer"
+	offermocks "github.com/jadechy/barterswap/internal/offer/mocks"
 	"github.com/jadechy/barterswap/internal/user"
+	usermocks "github.com/jadechy/barterswap/internal/user/mocks"
 )
 
 func TestCreate_SoiMeme_RetourneErreurSelfExchange(t *testing.T) {
-	repo := NewMockRepository(t)
-	tx := dbx.NewMockTxRunner(t)
-	offers := offer.NewMockRepository(t)
-	users := user.NewMockRepository(t)
+	repo := exchangemocks.NewMockRepository(t)
+	tx := dbxmocks.NewMockTxRunner(t)
+	offers := offermocks.NewMockRepository(t)
+	users := usermocks.NewMockRepository(t)
 	svc := NewService(repo, tx, offers, users, users)
 
 	offers.EXPECT().
@@ -32,10 +36,10 @@ func TestCreate_SoiMeme_RetourneErreurSelfExchange(t *testing.T) {
 }
 
 func TestCreate_EchangeActifExistant_RetourneErreurConflict(t *testing.T) {
-	repo := NewMockRepository(t)
-	tx := dbx.NewMockTxRunner(t)
-	offers := offer.NewMockRepository(t)
-	users := user.NewMockRepository(t)
+	repo := exchangemocks.NewMockRepository(t)
+	tx := dbxmocks.NewMockTxRunner(t)
+	offers := offermocks.NewMockRepository(t)
+	users := usermocks.NewMockRepository(t)
 	svc := NewService(repo, tx, offers, users, users)
 
 	offers.EXPECT().
@@ -52,10 +56,10 @@ func TestCreate_EchangeActifExistant_RetourneErreurConflict(t *testing.T) {
 }
 
 func TestCreate_SoldeInsuffisant_RetourneErreur(t *testing.T) {
-	repo := NewMockRepository(t)
-	tx := dbx.NewMockTxRunner(t)
-	offers := offer.NewMockRepository(t)
-	users := user.NewMockRepository(t)
+	repo := exchangemocks.NewMockRepository(t)
+	tx := dbxmocks.NewMockTxRunner(t)
+	offers := offermocks.NewMockRepository(t)
+	users := usermocks.NewMockRepository(t)
 	svc := NewService(repo, tx, offers, users, users)
 
 	offers.EXPECT().
@@ -75,10 +79,10 @@ func TestCreate_SoldeInsuffisant_RetourneErreur(t *testing.T) {
 }
 
 func TestCreate_Valide_Succes(t *testing.T) {
-	repo := NewMockRepository(t)
-	tx := dbx.NewMockTxRunner(t)
-	offers := offer.NewMockRepository(t)
-	users := user.NewMockRepository(t)
+	repo := exchangemocks.NewMockRepository(t)
+	tx := dbxmocks.NewMockTxRunner(t)
+	offers := offermocks.NewMockRepository(t)
+	users := usermocks.NewMockRepository(t)
 	svc := NewService(repo, tx, offers, users, users)
 
 	offers.EXPECT().
@@ -102,10 +106,10 @@ func TestCreate_Valide_Succes(t *testing.T) {
 }
 
 func TestAccept_NonProprietaire_RetourneErreurUnauthorized(t *testing.T) {
-	repo := NewMockRepository(t)
-	tx := dbx.NewMockTxRunner(t)
-	offers := offer.NewMockRepository(t)
-	users := user.NewMockRepository(t)
+	repo := exchangemocks.NewMockRepository(t)
+	tx := dbxmocks.NewMockTxRunner(t)
+	offers := offermocks.NewMockRepository(t)
+	users := usermocks.NewMockRepository(t)
 	svc := NewService(repo, tx, offers, users, users)
 
 	repo.EXPECT().
@@ -119,10 +123,10 @@ func TestAccept_NonProprietaire_RetourneErreurUnauthorized(t *testing.T) {
 }
 
 func TestAccept_StatutInvalide_RetourneErreur(t *testing.T) {
-	repo := NewMockRepository(t)
-	tx := dbx.NewMockTxRunner(t)
-	offers := offer.NewMockRepository(t)
-	users := user.NewMockRepository(t)
+	repo := exchangemocks.NewMockRepository(t)
+	tx := dbxmocks.NewMockTxRunner(t)
+	offers := offermocks.NewMockRepository(t)
+	users := usermocks.NewMockRepository(t)
 	svc := NewService(repo, tx, offers, users, users)
 
 	repo.EXPECT().
@@ -136,10 +140,10 @@ func TestAccept_StatutInvalide_RetourneErreur(t *testing.T) {
 }
 
 func TestAccept_Valide_Succes(t *testing.T) {
-	repo := NewMockRepository(t)
-	tx := dbx.NewMockTxRunner(t)
-	offers := offer.NewMockRepository(t)
-	users := user.NewMockRepository(t)
+	repo := exchangemocks.NewMockRepository(t)
+	tx := dbxmocks.NewMockTxRunner(t)
+	offers := offermocks.NewMockRepository(t)
+	users := usermocks.NewMockRepository(t)
 	svc := NewService(repo, tx, offers, users, users)
 
 	repo.EXPECT().
