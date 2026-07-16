@@ -1,3 +1,4 @@
+basePath: /api
 definitions:
   exchange.Exchange:
     properties:
@@ -104,10 +105,14 @@ definitions:
       ville:
         type: string
     type: object
+host: localhost:8080
 info:
   contact: {}
+  description: API de troc de services entre particuliers, basé sur des crédits-temps.
+  title: Armali Troc API
+  version: "1.0"
 paths:
-  /api/exchanges:
+  /exchanges:
     post:
       consumes:
       - application/json
@@ -125,10 +130,12 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/exchange.Exchange'
+      security:
+      - UserIDAuth: []
       summary: Créer une demande d'échange
       tags:
       - exchanges
-  /api/exchanges/{id}/accept:
+  /exchanges/{id}/accept:
     put:
       parameters:
       - description: ID échange
@@ -143,10 +150,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - UserIDAuth: []
       summary: Accepter un échange
       tags:
       - exchanges
-  /api/exchanges/{id}/review:
+  /exchanges/{id}/review:
     post:
       consumes:
       - application/json
@@ -175,10 +184,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - UserIDAuth: []
       summary: Laisser un avis sur un échange terminé
       tags:
       - reviews
-  /api/services:
+  /services:
     post:
       consumes:
       - application/json
@@ -202,10 +213,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - UserIDAuth: []
       summary: Créer une offre de service
       tags:
       - offers
-  /api/services/{id}:
+  /services/{id}:
     get:
       parameters:
       - description: ID de l'offre
@@ -226,10 +239,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - UserIDAuth: []
       summary: Récupérer une offre par ID
       tags:
       - offers
-  /api/services/{id}/reviews:
+  /services/{id}/reviews:
     get:
       parameters:
       - description: ID de l'offre
@@ -246,10 +261,12 @@ paths:
             items:
               $ref: '#/definitions/review.Review'
             type: array
+      security:
+      - UserIDAuth: []
       summary: Avis reçus sur une offre
       tags:
       - reviews
-  /api/users:
+  /users:
     post:
       consumes:
       - application/json
@@ -273,10 +290,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - UserIDAuth: []
       summary: Créer un utilisateur
       tags:
       - users
-  /api/users/{id}:
+  /users/{id}:
     get:
       parameters:
       - description: ID utilisateur
@@ -297,6 +316,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - UserIDAuth: []
       summary: Récupérer un utilisateur par ID
       tags:
       - users
@@ -328,10 +349,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - UserIDAuth: []
       summary: Mettre à jour un utilisateur
       tags:
       - users
-  /api/users/{id}/reviews:
+  /users/{id}/reviews:
     get:
       parameters:
       - description: ID utilisateur
@@ -348,10 +371,12 @@ paths:
             items:
               $ref: '#/definitions/review.Review'
             type: array
+      security:
+      - UserIDAuth: []
       summary: Avis reçus par un utilisateur
       tags:
       - reviews
-  /api/users/{id}/skills:
+  /users/{id}/skills:
     get:
       parameters:
       - description: ID utilisateur
@@ -368,6 +393,8 @@ paths:
             items:
               $ref: '#/definitions/user.Skill'
             type: array
+      security:
+      - UserIDAuth: []
       summary: Lister les compétences d'un utilisateur
       tags:
       - users
@@ -403,10 +430,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - UserIDAuth: []
       summary: Remplacer les compétences d'un utilisateur
       tags:
       - users
-  /api/users/{id}/stats:
+  /users/{id}/stats:
     get:
       parameters:
       - description: ID utilisateur
@@ -421,7 +450,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/user.Stats'
+      security:
+      - UserIDAuth: []
       summary: Statistiques d'un utilisateur
       tags:
       - users
+securityDefinitions:
+  UserIDAuth:
+    in: header
+    name: X-UserID
+    type: apiKey
 swagger: "2.0"

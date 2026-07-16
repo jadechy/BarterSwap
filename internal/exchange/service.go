@@ -10,8 +10,6 @@ import (
 	"github.com/jadechy/barterswap/internal/user"
 )
 
-// Interfaces locales : exchange ne dépend que de ce dont il a réellement besoin
-// dans offer et user, pas de l'intégralité de leurs Repository.
 type OfferGetter interface {
 	GetByID(ctx context.Context, id int) (offer.Offer, error)
 }

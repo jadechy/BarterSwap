@@ -19,12 +19,13 @@ func NewHandler(service *Service) *Handler {
 // Create godoc
 // @Summary      Créer un utilisateur
 // @Tags         users
+// @Security     UserIDAuth
 // @Accept       json
 // @Produce      json
 // @Param        user body User true "Utilisateur à créer"
 // @Success      201 {object} User
 // @Failure      400 {object} map[string]string
-// @Router       /api/users [post]
+// @Router       /users [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var u User
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
@@ -41,11 +42,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // GetByID godoc
 // @Summary      Récupérer un utilisateur par ID
 // @Tags         users
+// @Security     UserIDAuth
 // @Produce      json
 // @Param        id path int true "ID utilisateur"
 // @Success      200 {object} User
 // @Failure      404 {object} map[string]string
-// @Router       /api/users/{id} [get]
+// @Router       /users/{id} [get]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -63,13 +65,14 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 // Update godoc
 // @Summary      Mettre à jour un utilisateur
 // @Tags         users
+// @Security     UserIDAuth
 // @Accept       json
 // @Produce      json
 // @Param        id path int true "ID utilisateur"
 // @Param        user body User true "Données à mettre à jour"
 // @Success      200 {object} User
 // @Failure      400 {object} map[string]string
-// @Router       /api/users/{id} [put]
+// @Router       /users/{id} [put]
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -91,10 +94,11 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 // GetSkills godoc
 // @Summary      Lister les compétences d'un utilisateur
 // @Tags         users
+// @Security     UserIDAuth
 // @Produce      json
 // @Param        id path int true "ID utilisateur"
 // @Success      200 {array} Skill
-// @Router       /api/users/{id}/skills [get]
+// @Router       /users/{id}/skills [get]
 func (h *Handler) GetSkills(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -112,13 +116,14 @@ func (h *Handler) GetSkills(w http.ResponseWriter, r *http.Request) {
 // SetSkills godoc
 // @Summary      Remplacer les compétences d'un utilisateur
 // @Tags         users
+// @Security     UserIDAuth
 // @Accept       json
 // @Produce      json
 // @Param        id path int true "ID utilisateur"
 // @Param        skills body []Skill true "Nouvelle liste de compétences"
 // @Success      200 {array} Skill
 // @Failure      400 {object} map[string]string
-// @Router       /api/users/{id}/skills [put]
+// @Router       /users/{id}/skills [put]
 func (h *Handler) SetSkills(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -139,11 +144,12 @@ func (h *Handler) SetSkills(w http.ResponseWriter, r *http.Request) {
 
 // GetStats godoc
 // @Summary      Statistiques d'un utilisateur
+// @Security     UserIDAuth
 // @Tags         users
 // @Produce      json
 // @Param        id path int true "ID utilisateur"
 // @Success      200 {object} Stats
-// @Router       /api/users/{id}/stats [get]
+// @Router       /users/{id}/stats [get]
 func (h *Handler) GetStats(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {

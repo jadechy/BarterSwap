@@ -23,13 +23,14 @@ func currentUserID(r *http.Request) (int, error) {
 // Create godoc
 // @Summary      Laisser un avis sur un échange terminé
 // @Tags         reviews
+// @Security     UserIDAuth
 // @Accept       json
 // @Produce      json
 // @Param        id path int true "ID de l'échange"
 // @Param        review body object true "Note et commentaire"
 // @Success      201 {object} Review
 // @Failure      400 {object} map[string]string
-// @Router       /api/exchanges/{id}/review [post]
+// @Router       /exchanges/{id}/review [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	exchangeID, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -70,10 +71,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // GetByUserID godoc
 // @Summary      Avis reçus par un utilisateur
 // @Tags         reviews
+// @Security     UserIDAuth
 // @Produce      json
 // @Param        id path int true "ID utilisateur"
 // @Success      200 {array} Review
-// @Router       /api/users/{id}/reviews [get]
+// @Router       /users/{id}/reviews [get]
 func (h *Handler) GetByUserID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -91,10 +93,11 @@ func (h *Handler) GetByUserID(w http.ResponseWriter, r *http.Request) {
 // GetByServiceID godoc
 // @Summary      Avis reçus sur une offre
 // @Tags         reviews
+// @Security     UserIDAuth
 // @Produce      json
 // @Param        id path int true "ID de l'offre"
 // @Success      200 {array} Review
-// @Router       /api/services/{id}/reviews [get]
+// @Router       /services/{id}/reviews [get]
 func (h *Handler) GetByServiceID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {

@@ -1,11 +1,21 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API de troc de services entre particuliers, basé sur des crédits-temps.",
+        "title": "Armali Troc API",
+        "contact": {},
+        "version": "1.0"
     },
+    "host": "localhost:8080",
+    "basePath": "/api",
     "paths": {
-        "/api/exchanges": {
+        "/exchanges": {
             "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -37,8 +47,13 @@
                 }
             }
         },
-        "/api/exchanges/{id}/accept": {
+        "/exchanges/{id}/accept": {
             "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "tags": [
                     "exchanges"
                 ],
@@ -65,8 +80,13 @@
                 }
             }
         },
-        "/api/exchanges/{id}/review": {
+        "/exchanges/{id}/review": {
             "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -114,8 +134,13 @@
                 }
             }
         },
-        "/api/services": {
+        "/services": {
             "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -156,8 +181,13 @@
                 }
             }
         },
-        "/api/services/{id}": {
+        "/services/{id}": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -193,8 +223,13 @@
                 }
             }
         },
-        "/api/services/{id}/reviews": {
+        "/services/{id}/reviews": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -224,8 +259,13 @@
                 }
             }
         },
-        "/api/users": {
+        "/users": {
             "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -266,8 +306,13 @@
                 }
             }
         },
-        "/api/users/{id}": {
+        "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -303,6 +348,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -350,8 +400,13 @@
                 }
             }
         },
-        "/api/users/{id}/reviews": {
+        "/users/{id}/reviews": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -381,8 +436,13 @@
                 }
             }
         },
-        "/api/users/{id}/skills": {
+        "/users/{id}/skills": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -412,6 +472,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -465,8 +530,13 @@
                 }
             }
         },
-        "/api/users/{id}/stats": {
+        "/users/{id}/stats": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -653,6 +723,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "UserIDAuth": {
+            "type": "apiKey",
+            "name": "X-UserID",
+            "in": "header"
         }
     }
 }

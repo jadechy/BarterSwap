@@ -15,8 +15,13 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/exchanges": {
+        "/exchanges": {
             "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -48,8 +53,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/exchanges/{id}/accept": {
+        "/exchanges/{id}/accept": {
             "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "tags": [
                     "exchanges"
                 ],
@@ -76,8 +86,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/exchanges/{id}/review": {
+        "/exchanges/{id}/review": {
             "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -125,8 +140,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/services": {
+        "/services": {
             "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -167,8 +187,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/services/{id}": {
+        "/services/{id}": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -204,8 +229,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/services/{id}/reviews": {
+        "/services/{id}/reviews": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -235,8 +265,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users": {
+        "/users": {
             "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -277,8 +312,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}": {
+        "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -314,6 +354,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -361,8 +406,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}/reviews": {
+        "/users/{id}/reviews": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -392,8 +442,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}/skills": {
+        "/users/{id}/skills": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -423,6 +478,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -476,8 +536,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}/stats": {
+        "/users/{id}/stats": {
             "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -665,17 +730,24 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "UserIDAuth": {
+            "type": "apiKey",
+            "name": "X-UserID",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Armali Troc API",
+	Description:      "API de troc de services entre particuliers, basé sur des crédits-temps.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

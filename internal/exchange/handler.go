@@ -36,11 +36,12 @@ func parseAction(r *http.Request) (exchangeID, userID int, err error) {
 // Create godoc
 // @Summary      Créer une demande d'échange
 // @Tags         exchanges
+// @Security     UserIDAuth
 // @Accept       json
 // @Produce      json
 // @Param        exchange body object true "service_id"
 // @Success      201 {object} Exchange
-// @Router       /api/exchanges [post]
+// @Router       /exchanges [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	userID, err := currentUserID(r)
 	if err != nil {
@@ -98,9 +99,10 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 // Accept godoc
 // @Summary      Accepter un échange
 // @Tags         exchanges
+// @Security     UserIDAuth
 // @Param        id path int true "ID échange"
 // @Success      200 {object} map[string]string
-// @Router       /api/exchanges/{id}/accept [put]
+// @Router       /exchanges/{id}/accept [put]
 func (h *Handler) Accept(w http.ResponseWriter, r *http.Request) {
 	id, userID, err := parseAction(r)
 	if err != nil {

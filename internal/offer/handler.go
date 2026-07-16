@@ -19,12 +19,13 @@ func NewHandler(service *Service) *Handler {
 // Create godoc
 // @Summary      Créer une offre de service
 // @Tags         offers
+// @Security     UserIDAuth
 // @Accept       json
 // @Produce      json
 // @Param        offer body Offer true "Offre à créer"
 // @Success      201 {object} Offer
 // @Failure      400 {object} map[string]string
-// @Router       /api/services [post]
+// @Router       /services [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var o Offer
 	if err := json.NewDecoder(r.Body).Decode(&o); err != nil {
@@ -43,11 +44,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // GetByID godoc
 // @Summary      Récupérer une offre par ID
 // @Tags         offers
+// @Security     UserIDAuth
 // @Produce      json
 // @Param        id path int true "ID de l'offre"
 // @Success      200 {object} Offer
 // @Failure      404 {object} map[string]string
-// @Router       /api/services/{id} [get]
+// @Router       /services/{id} [get]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -63,5 +65,3 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	httpx.WriteJSON(w, http.StatusOK, o)
 }
-
-// List, Update, Delete suivent le même schéma...

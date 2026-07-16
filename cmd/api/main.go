@@ -14,6 +14,15 @@ import (
 	"github.com/jadechy/barterswap/internal/user"
 )
 
+// @title           Armali Troc API
+// @version         1.0
+// @description     API de troc de services entre particuliers, basé sur des crédits-temps.
+// @host            localhost:8080
+// @BasePath        /api
+
+// @securityDefinitions.apikey  UserIDAuth
+// @in                          header
+// @name                        X-UserID
 func main() {
 	db, err := database.Open()
 	if err != nil {
