@@ -20,20 +20,20 @@ import (
 )
 
 type exchangeMocks struct {
-	repo   *exchangemocks.MockRepository
-	tx     *dbxmocks.MockTxRunner
-	offers *servicemocks.MockRepository
-	users  *usermocks.MockRepository
+	repo     *exchangemocks.MockRepository
+	tx       *dbxmocks.MockTxRunner
+	services *servicemocks.MockRepository
+	users    *usermocks.MockRepository
 }
 
 func newExchangeService(t *testing.T) (*exchange.Manager, exchangeMocks) {
 	m := exchangeMocks{
-		repo:   exchangemocks.NewMockRepository(t),
-		tx:     dbxmocks.NewMockTxRunner(t),
-		offers: servicemocks.NewMockRepository(t),
-		users:  usermocks.NewMockRepository(t),
+		repo:     exchangemocks.NewMockRepository(t),
+		tx:       dbxmocks.NewMockTxRunner(t),
+		services: servicemocks.NewMockRepository(t),
+		users:    usermocks.NewMockRepository(t),
 	}
-	svc := exchange.NewService(m.repo, m.tx, m.offers, m.users, m.users)
+	svc := exchange.NewService(m.repo, m.tx, m.services, m.users, m.users)
 	return svc, m
 }
 
@@ -41,25 +41,25 @@ func TestCreate(t *testing.T) {
 	cases := []struct {
 		name        string
 		requesterID int
-		offerID     int
+		serviceID   int
 		setupMocks  func(m exchangeMocks)
 		wantErr     error
 	}{
 		{
 			name:        "soi-meme",
 			requesterID: 1,
-			offerID:     10,
+			serviceID:   10,
 			setupMocks: func(m exchangeMocks) {
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 1, Credits: 5}, nil)
+				m.services.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 1, Credits: 5}, nil)
 			},
 			wantErr: apperrors.ErrSelfExchange,
 		},
 		{
 			name:        "echange actif existant",
 			requesterID: 1,
-			offerID:     10,
+			serviceID:   10,
 			setupMocks: func(m exchangeMocks) {
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 5}, nil)
+				m.services.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 5}, nil)
 				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(true, nil)
 			},
 			wantErr: apperrors.ErrExchangeConflict,
@@ -67,9 +67,9 @@ func TestCreate(t *testing.T) {
 		{
 			name:        "solde insuffisant",
 			requesterID: 1,
-			offerID:     10,
+			serviceID:   10,
 			setupMocks: func(m exchangeMocks) {
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 20}, nil)
+				m.services.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 20}, nil)
 				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(false, nil)
 				m.users.EXPECT().GetByID(mock.Anything, 1).Return(user.User{ID: 1, CreditBalance: 5}, nil)
 			},
@@ -78,9 +78,9 @@ func TestCreate(t *testing.T) {
 		{
 			name:        "valide: succes",
 			requesterID: 1,
-			offerID:     10,
+			serviceID:   10,
 			setupMocks: func(m exchangeMocks) {
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 5}, nil)
+				m.services.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 5}, nil)
 				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(false, nil)
 				m.users.EXPECT().GetByID(mock.Anything, 1).Return(user.User{ID: 1, CreditBalance: 10}, nil)
 				m.repo.EXPECT().Create(mock.Anything, mock.AnythingOfType("*exchange.Exchange")).Return(nil)
@@ -94,7 +94,7 @@ func TestCreate(t *testing.T) {
 			svc, m := newExchangeService(t)
 			tc.setupMocks(m)
 
-			_, err := svc.Create(context.Background(), tc.requesterID, tc.offerID)
+			_, err := svc.Create(context.Background(), tc.requesterID, tc.serviceID)
 
 			if tc.wantErr != nil {
 				require.Error(t, err)
@@ -139,7 +139,7 @@ func TestAccept(t *testing.T) {
 			setupMocks: func(m exchangeMocks) {
 				m.repo.EXPECT().GetByID(mock.Anything, 1).
 					Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "pending"}, nil)
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, Credits: 5}, nil)
+				m.services.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, Credits: 5}, nil)
 				m.tx.EXPECT().
 					WithTx(mock.Anything, mock.AnythingOfType("func(dbx.Querier) error")).
 					RunAndReturn(func(ctx context.Context, fn func(dbx.Querier) error) error {

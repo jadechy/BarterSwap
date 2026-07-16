@@ -11,6 +11,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - .env
 
   db:
     image: mysql:8.0
@@ -20,6 +22,8 @@ services:
       - db-data:/var/lib/mysql
     ports:
       - "3307:3306"
+    env_file:
+      - .env
     healthcheck:
       test:
         [
@@ -38,6 +42,8 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    env_file:
+      - .env
     ports:
       - "8081:80"
     depends_on:

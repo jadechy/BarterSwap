@@ -23,7 +23,7 @@ func TestNewRouter_RouteConnue_Repond(t *testing.T) {
 	userHandler := user.NewHandler(user.NewService(userRepo))
 
 	serviceRepo := servicemocks.NewMockRepository(t)
-	offerHandler := service.NewHandler(service.NewService(serviceRepo, userRepo))
+	serviceHandler := service.NewHandler(service.NewService(serviceRepo, userRepo))
 
 	exchangeRepo := exchangemocks.NewMockRepository(t)
 	txMock := exchangeRepo // placeholder, remplace par un vrai mock TxRunner si besoin
@@ -36,7 +36,7 @@ func TestNewRouter_RouteConnue_Repond(t *testing.T) {
 
 	mux := httpserver.NewRouter(httpserver.Handlers{
 		User:     userHandler,
-		Service:  offerHandler,
+		Service:  serviceHandler,
 		Exchange: exchangeHandler,
 		Review:   reviewHandler,
 	})

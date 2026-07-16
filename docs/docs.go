@@ -328,17 +328,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "offers"
+                    "services"
                 ],
                 "summary": "Créer une offre de service",
                 "parameters": [
                     {
                         "description": "Offre à créer",
-                        "name": "offer",
+                        "name": "service",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.Offer"
+                            "$ref": "#/definitions/service.Service"
                         }
                     }
                 ],
@@ -346,7 +346,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/service.Offer"
+                            "$ref": "#/definitions/service.Service"
                         }
                     },
                     "400": {
@@ -372,13 +372,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "offers"
+                    "services"
                 ],
                 "summary": "Récupérer une offre par ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID de l'offre",
+                        "description": "ID du service",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -388,7 +388,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.Offer"
+                            "$ref": "#/definitions/service.Service"
                         }
                     },
                     "404": {
@@ -799,7 +799,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.Offer": {
+        "service.Service": {
             "type": "object",
             "properties": {
                 "actif": {

@@ -26,13 +26,13 @@ import (
 func newTestHandler(t *testing.T) (*exchange.Handler, *exchangemocks.MockRepository, *servicemocks.MockRepository, *usermocks.MockRepository, *dbxmocks.MockTxRunner) {
 	repo := exchangemocks.NewMockRepository(t)
 	tx := dbxmocks.NewMockTxRunner(t)
-	offers := servicemocks.NewMockRepository(t)
+	services := servicemocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
 
-	svc := exchange.NewService(repo, tx, offers, users, users)
+	svc := exchange.NewService(repo, tx, services, users, users)
 	h := exchange.NewHandler(svc)
 
-	return h, repo, offers, users, tx
+	return h, repo, services, users, tx
 }
 
 func expectWithTx(tx *dbxmocks.MockTxRunner) {
@@ -46,9 +46,9 @@ func expectWithTx(tx *dbxmocks.MockTxRunner) {
 // --- Create ---
 
 func TestHandler_Create_Succes(t *testing.T) {
-	h, repo, offers, users, _ := newTestHandler(t)
+	h, repo, services, users, _ := newTestHandler(t)
 
-	offers.EXPECT().
+	services.EXPECT().
 		GetByID(mock.Anything, 10).
 		Return(service.Service{ID: 10, ProviderID: 2, Credits: 5}, nil)
 	repo.EXPECT().
@@ -102,9 +102,9 @@ func TestHandler_Create_JSONInvalide_RetourneBadRequest(t *testing.T) {
 }
 
 func TestHandler_Create_SoiMeme_RetourneBadRequest(t *testing.T) {
-	h, _, offers, _, _ := newTestHandler(t)
+	h, _, services, _, _ := newTestHandler(t)
 
-	offers.EXPECT().
+	services.EXPECT().
 		GetByID(mock.Anything, 10).
 		Return(service.Service{ID: 10, ProviderID: 1, Credits: 5}, nil)
 
@@ -207,12 +207,12 @@ func TestHandler_GetByID_NonTrouve_RetourneNotFound(t *testing.T) {
 // --- Accept ---
 
 func TestHandler_Accept_Succes(t *testing.T) {
-	h, repo, offers, users, tx := newTestHandler(t)
+	h, repo, services, users, tx := newTestHandler(t)
 
 	repo.EXPECT().
 		GetByID(mock.Anything, 1).
 		Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "pending"}, nil)
-	offers.EXPECT().
+	services.EXPECT().
 		GetByID(mock.Anything, 10).
 		Return(service.Service{ID: 10, Credits: 5}, nil)
 
@@ -324,12 +324,12 @@ func TestHandler_Reject_NonProprietaire_RetourneForbidden(t *testing.T) {
 // --- Complete ---
 
 func TestHandler_Complete_Succes(t *testing.T) {
-	h, repo, offers, users, tx := newTestHandler(t)
+	h, repo, services, users, tx := newTestHandler(t)
 
 	repo.EXPECT().
 		GetByID(mock.Anything, 1).
 		Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "accepted"}, nil)
-	offers.EXPECT().
+	services.EXPECT().
 		GetByID(mock.Anything, 10).
 		Return(service.Service{ID: 10, Credits: 5}, nil)
 
@@ -393,12 +393,12 @@ func TestHandler_Cancel_Succes(t *testing.T) {
 }
 
 func TestHandler_Cancel_AccepteAvecRemboursement_Succes(t *testing.T) {
-	h, repo, offers, users, tx := newTestHandler(t)
+	h, repo, services, users, tx := newTestHandler(t)
 
 	repo.EXPECT().
 		GetByID(mock.Anything, 1).
 		Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "accepted"}, nil)
-	offers.EXPECT().
+	services.EXPECT().
 		GetByID(mock.Anything, 10).
 		Return(service.Service{ID: 10, Credits: 5}, nil)
 

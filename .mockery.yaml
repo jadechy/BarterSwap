@@ -14,7 +14,7 @@ packages:
   github.com/jadechy/barterswap/internal/exchange:
     interfaces:
       Repository:
-      OfferGetter:
+      ServiceGetter:
       UserGetter:
       CreditLedger:
   github.com/jadechy/barterswap/internal/review:

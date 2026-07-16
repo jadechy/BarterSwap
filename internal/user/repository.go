@@ -12,7 +12,7 @@ import (
 )
 
 // Repository expose tout ce dont les autres domaines ont besoin de user
-// (ex: offer.Service utilise GetSkills pour valider une création d'offre).
+// (ex: service.Service utilise GetSkills pour valider une création d'offre).
 type Repository interface {
 	GetByID(ctx context.Context, id int) (User, error)
 	Create(ctx context.Context, u *User) error

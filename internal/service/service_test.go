@@ -18,31 +18,31 @@ import (
 func TestCreate(t *testing.T) {
 	cases := []struct {
 		name       string
-		offer      *service.Service
+		service    *service.Service
 		setupMocks func(repo *servicemocks.MockRepository, userRepo *usermocks.MockRepository)
 		wantErr    error // nil si succès attendu
 	}{
 		{
 			name:       "titre vide",
-			offer:      &service.Service{Titre: "", Categorie: "Informatique", Credits: 5, ProviderID: 1},
+			service:    &service.Service{Titre: "", Categorie: "Informatique", Credits: 5, ProviderID: 1},
 			setupMocks: func(repo *servicemocks.MockRepository, userRepo *usermocks.MockRepository) {},
 			wantErr:    apperrors.ErrValidation,
 		},
 		{
 			name:       "categorie invalide",
-			offer:      &service.Service{Titre: "Cours de piano", Categorie: "Sorcellerie", Credits: 5, ProviderID: 1},
+			service:    &service.Service{Titre: "Cours de piano", Categorie: "Sorcellerie", Credits: 5, ProviderID: 1},
 			setupMocks: func(repo *servicemocks.MockRepository, userRepo *usermocks.MockRepository) {},
 			wantErr:    apperrors.ErrValidation,
 		},
 		{
 			name:       "credits nuls ou negatifs",
-			offer:      &service.Service{Titre: "Cours de piano", Categorie: "Musique", Credits: 0, ProviderID: 1},
+			service:    &service.Service{Titre: "Cours de piano", Categorie: "Musique", Credits: 0, ProviderID: 1},
 			setupMocks: func(repo *servicemocks.MockRepository, userRepo *usermocks.MockRepository) {},
 			wantErr:    apperrors.ErrValidation,
 		},
 		{
-			name:  "provider sans la competence",
-			offer: &service.Service{Titre: "Cours de piano", Categorie: "Musique", Credits: 5, ProviderID: 1},
+			name:    "provider sans la competence",
+			service: &service.Service{Titre: "Cours de piano", Categorie: "Musique", Credits: 5, ProviderID: 1},
 			setupMocks: func(repo *servicemocks.MockRepository, userRepo *usermocks.MockRepository) {
 				userRepo.EXPECT().
 					GetSkills(mock.Anything, 1).
@@ -51,8 +51,8 @@ func TestCreate(t *testing.T) {
 			wantErr: apperrors.ErrValidation,
 		},
 		{
-			name:  "provider avec la competence: succes",
-			offer: &service.Service{Titre: "Cours de piano", Categorie: "Musique", Credits: 5, ProviderID: 1},
+			name:    "provider avec la competence: succes",
+			service: &service.Service{Titre: "Cours de piano", Categorie: "Musique", Credits: 5, ProviderID: 1},
 			setupMocks: func(repo *servicemocks.MockRepository, userRepo *usermocks.MockRepository) {
 				userRepo.EXPECT().
 					GetSkills(mock.Anything, 1).
@@ -70,7 +70,7 @@ func TestCreate(t *testing.T) {
 			tc.setupMocks(repo, userRepo)
 			svc := service.NewService(repo, userRepo)
 
-			err := svc.Create(context.Background(), tc.offer)
+			err := svc.Create(context.Background(), tc.service)
 
 			if tc.wantErr != nil {
 				require.Error(t, err)

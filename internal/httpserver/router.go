@@ -34,12 +34,12 @@ func NewRouter(h Handlers) *http.ServeMux {
 	mux.HandleFunc("GET /api/users/{id}/stats", h.User.GetStats)
 	mux.HandleFunc("GET /api/users/{id}/reviews", h.Review.GetByUserID)
 
-	// --- Offers  ---
-	// mux.HandleFunc("GET /api/services", h.Offer.List)
+	// --- Services  ---
+	// mux.HandleFunc("GET /api/services", h.Service.List)
 	mux.HandleFunc("POST /api/services", h.Service.Create)
 	mux.HandleFunc("GET /api/services/{id}", h.Service.GetByID)
-	// mux.HandleFunc("PUT /api/services/{id}", h.Offer.Update)
-	// mux.HandleFunc("DELETE /api/services/{id}", h.Offer.Delete)
+	// mux.HandleFunc("PUT /api/services/{id}", h.Service.Update)
+	// mux.HandleFunc("DELETE /api/services/{id}", h.Service.Delete)
 	mux.HandleFunc("GET /api/services/{id}/reviews", h.Review.GetByServiceID)
 
 	// --- Exchanges ---

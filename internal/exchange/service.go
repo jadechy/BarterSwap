@@ -10,7 +10,7 @@ import (
 	"github.com/jadechy/barterswap/internal/user"
 )
 
-type OfferGetter interface {
+type ServiceGetter interface {
 	GetByID(ctx context.Context, id int) (service.Service, error)
 }
 
@@ -25,19 +25,19 @@ type CreditLedger interface {
 type Manager struct {
 	repo      Repository
 	txManager dbx.TxRunner
-	offers    OfferGetter
+	services  ServiceGetter
 	users     UserGetter
 	credits   CreditLedger
 }
 
-func NewService(repo Repository, txManager dbx.TxRunner, offers OfferGetter, users UserGetter, credits CreditLedger) *Manager {
-	return &Manager{repo: repo, txManager: txManager, offers: offers, users: users, credits: credits}
+func NewService(repo Repository, txManager dbx.TxRunner, services ServiceGetter, users UserGetter, credits CreditLedger) *Manager {
+	return &Manager{repo: repo, txManager: txManager, services: services, users: users, credits: credits}
 }
 
-func (s *Manager) Create(ctx context.Context, requesterID, offerID int) (Exchange, error) {
+func (s *Manager) Create(ctx context.Context, requesterID, serviceID int) (Exchange, error) {
 	var e Exchange
 
-	o, err := s.offers.GetByID(ctx, offerID)
+	o, err := s.services.GetByID(ctx, serviceID)
 	if err != nil {
 		return e, err
 	}
@@ -46,7 +46,7 @@ func (s *Manager) Create(ctx context.Context, requesterID, offerID int) (Exchang
 		return e, fmt.Errorf("impossible de s'échanger son propre service: %w", apperrors.ErrSelfExchange)
 	}
 
-	active, err := s.repo.HasActive(ctx, offerID)
+	active, err := s.repo.HasActive(ctx, serviceID)
 	if err != nil {
 		return e, err
 	}
@@ -63,7 +63,7 @@ func (s *Manager) Create(ctx context.Context, requesterID, offerID int) (Exchang
 	}
 
 	e = Exchange{
-		ServiceID:   offerID,
+		ServiceID:   serviceID,
 		RequesterID: requesterID,
 		OwnerID:     o.ProviderID,
 	}
@@ -91,7 +91,7 @@ func (s *Manager) Accept(ctx context.Context, exchangeID, userID int) error {
 		return fmt.Errorf("l'échange n'est pas en attente: %w", apperrors.ErrInvalidStatus)
 	}
 
-	o, err := s.offers.GetByID(ctx, e.ServiceID)
+	o, err := s.services.GetByID(ctx, e.ServiceID)
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (s *Manager) Complete(ctx context.Context, exchangeID, userID int) error {
 		return fmt.Errorf("l'échange doit être accepté pour être terminé: %w", apperrors.ErrInvalidStatus)
 	}
 
-	o, err := s.offers.GetByID(ctx, e.ServiceID)
+	o, err := s.services.GetByID(ctx, e.ServiceID)
 	if err != nil {
 		return err
 	}
@@ -160,7 +160,7 @@ func (s *Manager) Cancel(ctx context.Context, exchangeID, userID int) error {
 
 	return s.txManager.WithTx(ctx, func(q dbx.Querier) error {
 		if e.Status == "accepted" {
-			o, err := s.offers.GetByID(ctx, e.ServiceID)
+			o, err := s.services.GetByID(ctx, e.ServiceID)
 			if err != nil {
 				return err
 			}

@@ -260,7 +260,7 @@ internal/
 ├── database/        → connexion MySQL
 ├── httpserver/      → middlewares (auth, CORS, logging, recovery) + routeur
 ├── user/            → repository → service → handler
-├── offer/           → idem
+├── service/           → idem
 ├── exchange/        → idem (+ gestion transactionnelle des crédits)
 └── review/          → idem
 docs/                → spécification Swagger générée
@@ -311,7 +311,7 @@ Ou directement :
 docker compose exec go go test ./... -v -cover
 ```
 
-**Couverture actuelle : ≥ 70%** sur les packages métier (`user`, `offer`, `exchange`, `review`, `httpserver`, `httpx`, `dbx`, `apperrors`).
+**Couverture actuelle : ≥ 70%** sur les packages métier (`user`, `service`, `exchange`, `review`, `httpserver`, `httpx`, `dbx`, `apperrors`).
 
 Le calcul exclut volontairement :
 
