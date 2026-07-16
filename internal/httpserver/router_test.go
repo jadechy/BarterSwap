@@ -10,10 +10,10 @@ import (
 	"github.com/jadechy/barterswap/internal/exchange"
 	exchangemocks "github.com/jadechy/barterswap/internal/exchange/mocks"
 	"github.com/jadechy/barterswap/internal/httpserver"
-	"github.com/jadechy/barterswap/internal/offer"
-	offermocks "github.com/jadechy/barterswap/internal/offer/mocks"
 	"github.com/jadechy/barterswap/internal/review"
 	reviewmocks "github.com/jadechy/barterswap/internal/review/mocks"
+	"github.com/jadechy/barterswap/internal/service"
+	servicemocks "github.com/jadechy/barterswap/internal/service/mocks"
 	"github.com/jadechy/barterswap/internal/user"
 	usermocks "github.com/jadechy/barterswap/internal/user/mocks"
 )
@@ -22,8 +22,8 @@ func TestNewRouter_RouteConnue_Repond(t *testing.T) {
 	userRepo := usermocks.NewMockRepository(t)
 	userHandler := user.NewHandler(user.NewService(userRepo))
 
-	offerRepo := offermocks.NewMockRepository(t)
-	offerHandler := offer.NewHandler(offer.NewService(offerRepo, userRepo))
+	serviceRepo := servicemocks.NewMockRepository(t)
+	offerHandler := service.NewHandler(service.NewService(serviceRepo, userRepo))
 
 	exchangeRepo := exchangemocks.NewMockRepository(t)
 	txMock := exchangeRepo // placeholder, remplace par un vrai mock TxRunner si besoin
@@ -36,7 +36,7 @@ func TestNewRouter_RouteConnue_Repond(t *testing.T) {
 
 	mux := httpserver.NewRouter(httpserver.Handlers{
 		User:     userHandler,
-		Offer:    offerHandler,
+		Service:  offerHandler,
 		Exchange: exchangeHandler,
 		Review:   reviewHandler,
 	})

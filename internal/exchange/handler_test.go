@@ -17,16 +17,16 @@ import (
 	dbxmocks "github.com/jadechy/barterswap/internal/dbx/mocks"
 	"github.com/jadechy/barterswap/internal/exchange"
 	exchangemocks "github.com/jadechy/barterswap/internal/exchange/mocks"
-	"github.com/jadechy/barterswap/internal/offer"
-	offermocks "github.com/jadechy/barterswap/internal/offer/mocks"
+	"github.com/jadechy/barterswap/internal/service"
+	servicemocks "github.com/jadechy/barterswap/internal/service/mocks"
 	"github.com/jadechy/barterswap/internal/user"
 	usermocks "github.com/jadechy/barterswap/internal/user/mocks"
 )
 
-func newTestHandler(t *testing.T) (*exchange.Handler, *exchangemocks.MockRepository, *offermocks.MockRepository, *usermocks.MockRepository, *dbxmocks.MockTxRunner) {
+func newTestHandler(t *testing.T) (*exchange.Handler, *exchangemocks.MockRepository, *servicemocks.MockRepository, *usermocks.MockRepository, *dbxmocks.MockTxRunner) {
 	repo := exchangemocks.NewMockRepository(t)
 	tx := dbxmocks.NewMockTxRunner(t)
-	offers := offermocks.NewMockRepository(t)
+	offers := servicemocks.NewMockRepository(t)
 	users := usermocks.NewMockRepository(t)
 
 	svc := exchange.NewService(repo, tx, offers, users, users)
@@ -50,7 +50,7 @@ func TestHandler_Create_Succes(t *testing.T) {
 
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 5}, nil)
+		Return(service.Service{ID: 10, ProviderID: 2, Credits: 5}, nil)
 	repo.EXPECT().
 		HasActive(mock.Anything, 10).
 		Return(false, nil)
@@ -106,7 +106,7 @@ func TestHandler_Create_SoiMeme_RetourneBadRequest(t *testing.T) {
 
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, ProviderID: 1, Credits: 5}, nil)
+		Return(service.Service{ID: 10, ProviderID: 1, Credits: 5}, nil)
 
 	body := strings.NewReader(`{"service_id": 10}`)
 	req := httptest.NewRequest(http.MethodPost, "/api/exchanges", body)
@@ -214,7 +214,7 @@ func TestHandler_Accept_Succes(t *testing.T) {
 		Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "pending"}, nil)
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, Credits: 5}, nil)
+		Return(service.Service{ID: 10, Credits: 5}, nil)
 
 	expectWithTx(tx)
 	users.EXPECT().
@@ -331,7 +331,7 @@ func TestHandler_Complete_Succes(t *testing.T) {
 		Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "accepted"}, nil)
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, Credits: 5}, nil)
+		Return(service.Service{ID: 10, Credits: 5}, nil)
 
 	expectWithTx(tx)
 	users.EXPECT().
@@ -400,7 +400,7 @@ func TestHandler_Cancel_AccepteAvecRemboursement_Succes(t *testing.T) {
 		Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "accepted"}, nil)
 	offers.EXPECT().
 		GetByID(mock.Anything, 10).
-		Return(offer.Offer{ID: 10, Credits: 5}, nil)
+		Return(service.Service{ID: 10, Credits: 5}, nil)
 
 	expectWithTx(tx)
 	users.EXPECT().

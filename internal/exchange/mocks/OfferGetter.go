@@ -7,7 +7,7 @@ package exchangemocks
 import (
 	"context"
 
-	"github.com/jadechy/barterswap/internal/offer"
+	"github.com/jadechy/barterswap/internal/service"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -39,22 +39,22 @@ func (_m *MockOfferGetter) EXPECT() *MockOfferGetter_Expecter {
 }
 
 // GetByID provides a mock function for the type MockOfferGetter
-func (_mock *MockOfferGetter) GetByID(ctx context.Context, id int) (offer.Offer, error) {
+func (_mock *MockOfferGetter) GetByID(ctx context.Context, id int) (service.Service, error) {
 	ret := _mock.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByID")
 	}
 
-	var r0 offer.Offer
+	var r0 service.Service
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (offer.Offer, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) (service.Service, error)); ok {
 		return returnFunc(ctx, id)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) offer.Offer); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) service.Service); ok {
 		r0 = returnFunc(ctx, id)
 	} else {
-		r0 = ret.Get(0).(offer.Offer)
+		r0 = ret.Get(0).(service.Service)
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
 		r1 = returnFunc(ctx, id)
@@ -94,12 +94,12 @@ func (_c *MockOfferGetter_GetByID_Call) Run(run func(ctx context.Context, id int
 	return _c
 }
 
-func (_c *MockOfferGetter_GetByID_Call) Return(offer1 offer.Offer, err error) *MockOfferGetter_GetByID_Call {
-	_c.Call.Return(offer1, err)
+func (_c *MockOfferGetter_GetByID_Call) Return(service1 service.Service, err error) *MockOfferGetter_GetByID_Call {
+	_c.Call.Return(service1, err)
 	return _c
 }
 
-func (_c *MockOfferGetter_GetByID_Call) RunAndReturn(run func(ctx context.Context, id int) (offer.Offer, error)) *MockOfferGetter_GetByID_Call {
+func (_c *MockOfferGetter_GetByID_Call) RunAndReturn(run func(ctx context.Context, id int) (service.Service, error)) *MockOfferGetter_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }

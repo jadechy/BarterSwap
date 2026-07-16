@@ -1,4 +1,4 @@
-package offer_test
+package service_test
 
 import (
 	"encoding/json"
@@ -12,19 +12,19 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/jadechy/barterswap/internal/apperrors"
-	"github.com/jadechy/barterswap/internal/offer"
-	offermocks "github.com/jadechy/barterswap/internal/offer/mocks"
+	"github.com/jadechy/barterswap/internal/service"
+	servicemocks "github.com/jadechy/barterswap/internal/service/mocks"
 	"github.com/jadechy/barterswap/internal/user"
 	usermocks "github.com/jadechy/barterswap/internal/user/mocks"
 )
 
 // newTestHandler construit un Handler avec un vrai Service, mais des repositories mockés.
-func newTestHandler(t *testing.T) (*offer.Handler, *offermocks.MockRepository, *usermocks.MockRepository) {
-	repo := offermocks.NewMockRepository(t)
+func newTestHandler(t *testing.T) (*service.Handler, *servicemocks.MockRepository, *usermocks.MockRepository) {
+	repo := servicemocks.NewMockRepository(t)
 	userRepo := usermocks.NewMockRepository(t)
 
-	svc := offer.NewService(repo, userRepo)
-	h := offer.NewHandler(svc)
+	svc := service.NewService(repo, userRepo)
+	h := service.NewHandler(svc)
 
 	return h, repo, userRepo
 }
@@ -38,7 +38,7 @@ func TestHandler_Create_Succes(t *testing.T) {
 		GetSkills(mock.Anything, 1).
 		Return([]user.Skill{{Nom: "Informatique"}}, nil)
 	repo.EXPECT().
-		Create(mock.Anything, mock.AnythingOfType("*offer.Offer")).
+		Create(mock.Anything, mock.AnythingOfType("*service.Service")).
 		Return(nil)
 
 	body := strings.NewReader(`{
@@ -55,7 +55,7 @@ func TestHandler_Create_Succes(t *testing.T) {
 
 	require.Equal(t, http.StatusCreated, rec.Code)
 
-	var got offer.Offer
+	var got service.Service
 	require.NoError(t, json.NewDecoder(rec.Body).Decode(&got))
 	assert.Equal(t, "Cours de programmation", got.Titre)
 	assert.Equal(t, "Informatique", got.Categorie)
@@ -164,7 +164,7 @@ func TestHandler_GetByID_Succes(t *testing.T) {
 
 	repo.EXPECT().
 		GetByID(mock.Anything, 1).
-		Return(offer.Offer{ID: 1, Titre: "Cours de guitare", Categorie: "Musique"}, nil)
+		Return(service.Service{ID: 1, Titre: "Cours de guitare", Categorie: "Musique"}, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/services/1", nil)
 	req.SetPathValue("id", "1")
@@ -174,7 +174,7 @@ func TestHandler_GetByID_Succes(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, rec.Code)
 
-	var got offer.Offer
+	var got service.Service
 	require.NoError(t, json.NewDecoder(rec.Body).Decode(&got))
 	assert.Equal(t, "Cours de guitare", got.Titre)
 }
@@ -196,7 +196,7 @@ func TestHandler_GetByID_NonTrouve_RetourneNotFound(t *testing.T) {
 
 	repo.EXPECT().
 		GetByID(mock.Anything, 999).
-		Return(offer.Offer{}, apperrors.ErrNotFound)
+		Return(service.Service{}, apperrors.ErrNotFound)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/services/999", nil)
 	req.SetPathValue("id", "999")

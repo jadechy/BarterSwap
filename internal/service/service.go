@@ -1,4 +1,4 @@
-package offer
+package service
 
 import (
 	"context"
@@ -9,16 +9,16 @@ import (
 	"github.com/jadechy/barterswap/internal/user"
 )
 
-type Service struct {
+type Manager struct {
 	repo     Repository
 	userRepo user.Repository
 }
 
-func NewService(repo Repository, userRepo user.Repository) *Service {
-	return &Service{repo: repo, userRepo: userRepo}
+func NewService(repo Repository, userRepo user.Repository) *Manager {
+	return &Manager{repo: repo, userRepo: userRepo}
 }
 
-func (s *Service) Create(ctx context.Context, o *Offer) error {
+func (s *Manager) Create(ctx context.Context, o *Service) error {
 	if strings.TrimSpace(o.Titre) == "" {
 		return apperrors.ValidationError{Champ: "titre", Message: "le titre est requis"}
 	}
@@ -54,15 +54,15 @@ func (s *Service) Create(ctx context.Context, o *Offer) error {
 	return s.repo.Create(ctx, o)
 }
 
-func (s *Service) GetByID(ctx context.Context, id int) (Offer, error) {
+func (s *Manager) GetByID(ctx context.Context, id int) (Service, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *Service) List(ctx context.Context, f ListFilter) ([]Offer, error) {
+func (s *Manager) List(ctx context.Context, f ListFilter) ([]Service, error) {
 	return s.repo.List(ctx, f)
 }
 
-func (s *Service) Update(ctx context.Context, id int, o *Offer) error {
+func (s *Manager) Update(ctx context.Context, id int, o *Service) error {
 	if !contains(CategoriesValides, o.Categorie) {
 		return apperrors.ValidationError{
 			Champ:   "categorie",
@@ -72,7 +72,7 @@ func (s *Service) Update(ctx context.Context, id int, o *Offer) error {
 	return s.repo.Update(ctx, id, o)
 }
 
-func (s *Service) Delete(ctx context.Context, id int) error {
+func (s *Manager) Delete(ctx context.Context, id int) error {
 	return s.repo.Delete(ctx, id)
 }
 

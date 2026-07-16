@@ -13,8 +13,8 @@ import (
 	dbxmocks "github.com/jadechy/barterswap/internal/dbx/mocks"
 	"github.com/jadechy/barterswap/internal/exchange"
 	exchangemocks "github.com/jadechy/barterswap/internal/exchange/mocks"
-	"github.com/jadechy/barterswap/internal/offer"
-	offermocks "github.com/jadechy/barterswap/internal/offer/mocks"
+	"github.com/jadechy/barterswap/internal/service"
+	servicemocks "github.com/jadechy/barterswap/internal/service/mocks"
 	"github.com/jadechy/barterswap/internal/user"
 	usermocks "github.com/jadechy/barterswap/internal/user/mocks"
 )
@@ -22,15 +22,15 @@ import (
 type exchangeMocks struct {
 	repo   *exchangemocks.MockRepository
 	tx     *dbxmocks.MockTxRunner
-	offers *offermocks.MockRepository
+	offers *servicemocks.MockRepository
 	users  *usermocks.MockRepository
 }
 
-func newExchangeService(t *testing.T) (*exchange.Service, exchangeMocks) {
+func newExchangeService(t *testing.T) (*exchange.Manager, exchangeMocks) {
 	m := exchangeMocks{
 		repo:   exchangemocks.NewMockRepository(t),
 		tx:     dbxmocks.NewMockTxRunner(t),
-		offers: offermocks.NewMockRepository(t),
+		offers: servicemocks.NewMockRepository(t),
 		users:  usermocks.NewMockRepository(t),
 	}
 	svc := exchange.NewService(m.repo, m.tx, m.offers, m.users, m.users)
@@ -50,7 +50,7 @@ func TestCreate(t *testing.T) {
 			requesterID: 1,
 			offerID:     10,
 			setupMocks: func(m exchangeMocks) {
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, ProviderID: 1, Credits: 5}, nil)
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 1, Credits: 5}, nil)
 			},
 			wantErr: apperrors.ErrSelfExchange,
 		},
@@ -59,7 +59,7 @@ func TestCreate(t *testing.T) {
 			requesterID: 1,
 			offerID:     10,
 			setupMocks: func(m exchangeMocks) {
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 5}, nil)
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 5}, nil)
 				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(true, nil)
 			},
 			wantErr: apperrors.ErrExchangeConflict,
@@ -69,7 +69,7 @@ func TestCreate(t *testing.T) {
 			requesterID: 1,
 			offerID:     10,
 			setupMocks: func(m exchangeMocks) {
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 20}, nil)
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 20}, nil)
 				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(false, nil)
 				m.users.EXPECT().GetByID(mock.Anything, 1).Return(user.User{ID: 1, CreditBalance: 5}, nil)
 			},
@@ -80,7 +80,7 @@ func TestCreate(t *testing.T) {
 			requesterID: 1,
 			offerID:     10,
 			setupMocks: func(m exchangeMocks) {
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, ProviderID: 2, Credits: 5}, nil)
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, ProviderID: 2, Credits: 5}, nil)
 				m.repo.EXPECT().HasActive(mock.Anything, 10).Return(false, nil)
 				m.users.EXPECT().GetByID(mock.Anything, 1).Return(user.User{ID: 1, CreditBalance: 10}, nil)
 				m.repo.EXPECT().Create(mock.Anything, mock.AnythingOfType("*exchange.Exchange")).Return(nil)
@@ -139,7 +139,7 @@ func TestAccept(t *testing.T) {
 			setupMocks: func(m exchangeMocks) {
 				m.repo.EXPECT().GetByID(mock.Anything, 1).
 					Return(exchange.Exchange{ID: 1, ServiceID: 10, OwnerID: 2, RequesterID: 1, Status: "pending"}, nil)
-				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(offer.Offer{ID: 10, Credits: 5}, nil)
+				m.offers.EXPECT().GetByID(mock.Anything, 10).Return(service.Service{ID: 10, Credits: 5}, nil)
 				m.tx.EXPECT().
 					WithTx(mock.Anything, mock.AnythingOfType("func(dbx.Querier) error")).
 					RunAndReturn(func(ctx context.Context, fn func(dbx.Querier) error) error {

@@ -8,37 +8,37 @@ import (
 	"github.com/jadechy/barterswap/internal/apperrors"
 )
 
-type Service struct {
+type Manager struct {
 	repo Repository
 }
 
-func NewService(repo Repository) *Service {
-	return &Service{repo: repo}
+func NewService(repo Repository) *Manager {
+	return &Manager{repo: repo}
 }
 
-func (s *Service) Create(ctx context.Context, u *User) error {
+func (s *Manager) Create(ctx context.Context, u *User) error {
 	if strings.TrimSpace(u.Pseudo) == "" {
 		return apperrors.ValidationError{Champ: "pseudo", Message: "le pseudo est requis"}
 	}
 	return s.repo.Create(ctx, u)
 }
 
-func (s *Service) GetByID(ctx context.Context, id int) (User, error) {
+func (s *Manager) GetByID(ctx context.Context, id int) (User, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *Service) Update(ctx context.Context, id int, u *User) error {
+func (s *Manager) Update(ctx context.Context, id int, u *User) error {
 	if strings.TrimSpace(u.Pseudo) == "" {
 		return apperrors.ValidationError{Champ: "pseudo", Message: "le pseudo est requis"}
 	}
 	return s.repo.Update(ctx, id, u)
 }
 
-func (s *Service) GetSkills(ctx context.Context, userID int) ([]Skill, error) {
+func (s *Manager) GetSkills(ctx context.Context, userID int) ([]Skill, error) {
 	return s.repo.GetSkills(ctx, userID)
 }
 
-func (s *Service) SetSkills(ctx context.Context, userID int, skills []Skill) error {
+func (s *Manager) SetSkills(ctx context.Context, userID int, skills []Skill) error {
 	for _, sk := range skills {
 		if !contains(NiveauxValides, sk.Niveau) {
 			return apperrors.ValidationError{
@@ -53,7 +53,7 @@ func (s *Service) SetSkills(ctx context.Context, userID int, skills []Skill) err
 	return s.repo.SetSkills(ctx, userID, skills)
 }
 
-func (s *Service) Stats(ctx context.Context, userID int) (Stats, error) {
+func (s *Manager) Stats(ctx context.Context, userID int) (Stats, error) {
 	return s.repo.Stats(ctx, userID)
 }
 

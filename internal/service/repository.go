@@ -1,4 +1,4 @@
-package offer
+package service
 
 import (
 	"context"
@@ -10,10 +10,10 @@ import (
 )
 
 type Repository interface {
-	GetByID(ctx context.Context, id int) (Offer, error)
-	List(ctx context.Context, f ListFilter) ([]Offer, error)
-	Create(ctx context.Context, o *Offer) error
-	Update(ctx context.Context, id int, o *Offer) error
+	GetByID(ctx context.Context, id int) (Service, error)
+	List(ctx context.Context, f ListFilter) ([]Service, error)
+	Create(ctx context.Context, o *Service) error
+	Update(ctx context.Context, id int, o *Service) error
 	Delete(ctx context.Context, id int) error
 }
 
@@ -25,8 +25,8 @@ func NewRepository(db *sql.DB) Repository {
 	return &sqlRepository{db: db}
 }
 
-func (r *sqlRepository) GetByID(ctx context.Context, id int) (Offer, error) {
-	var o Offer
+func (r *sqlRepository) GetByID(ctx context.Context, id int) (Service, error) {
+	var o Service
 	row := r.db.QueryRowContext(ctx, `
 		SELECT id, provider_id, titre, description, categorie,
 		       duree_minutes, credits, ville, actif, created_at
@@ -43,7 +43,7 @@ func (r *sqlRepository) GetByID(ctx context.Context, id int) (Offer, error) {
 	return o, nil
 }
 
-func (r *sqlRepository) List(ctx context.Context, f ListFilter) ([]Offer, error) {
+func (r *sqlRepository) List(ctx context.Context, f ListFilter) ([]Service, error) {
 	query := `SELECT id, provider_id, titre, description, categorie,
 	                 duree_minutes, credits, ville, actif, created_at
 	          FROM services WHERE actif = true`
@@ -72,9 +72,9 @@ func (r *sqlRepository) List(ctx context.Context, f ListFilter) ([]Offer, error)
 		}
 	}()
 
-	var offers []Offer
+	var offers []Service
 	for rows.Next() {
-		var o Offer
+		var o Service
 		if err := rows.Scan(&o.ID, &o.ProviderID, &o.Titre, &o.Description,
 			&o.Categorie, &o.DureeMinutes, &o.Credits, &o.Ville, &o.Actif, &o.CreatedAt); err != nil {
 			return nil, fmt.Errorf("offer.List scan: %w", err)
@@ -87,7 +87,7 @@ func (r *sqlRepository) List(ctx context.Context, f ListFilter) ([]Offer, error)
 	return offers, nil
 }
 
-func (r *sqlRepository) Create(ctx context.Context, o *Offer) error {
+func (r *sqlRepository) Create(ctx context.Context, o *Service) error {
 	result, err := r.db.ExecContext(ctx, `
 		INSERT INTO services (provider_id, titre, description, categorie, duree_minutes, credits, ville, actif)
 		VALUES (?, ?, ?, ?, ?, ?, ?, true)`,
@@ -100,7 +100,7 @@ func (r *sqlRepository) Create(ctx context.Context, o *Offer) error {
 	return nil
 }
 
-func (r *sqlRepository) Update(ctx context.Context, id int, o *Offer) error {
+func (r *sqlRepository) Update(ctx context.Context, id int, o *Service) error {
 	result, err := r.db.ExecContext(ctx, `
 		UPDATE services SET titre = ?, description = ?, categorie = ?,
 		duree_minutes = ?, credits = ?, ville = ?, actif = ?

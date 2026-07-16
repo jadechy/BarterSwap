@@ -10,11 +10,11 @@ import (
 )
 
 type Handler struct {
-	service *Service
+	manager *Manager
 }
 
-func NewHandler(service *Service) *Handler {
-	return &Handler{service: service}
+func NewHandler(manager *Manager) *Handler {
+	return &Handler{manager: manager}
 }
 
 func currentUserID(r *http.Request) (int, error) {
@@ -57,7 +57,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	e, err := h.service.Create(r.Context(), userID, body.ServiceID)
+	e, err := h.manager.Create(r.Context(), userID, body.ServiceID)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -82,7 +82,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	}
 	status := r.URL.Query().Get("status")
 
-	exchanges, err := h.service.List(r.Context(), userID, status)
+	exchanges, err := h.manager.List(r.Context(), userID, status)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -105,7 +105,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
 		return
 	}
-	e, err := h.service.GetByID(r.Context(), id)
+	e, err := h.manager.GetByID(r.Context(), id)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -126,7 +126,7 @@ func (h *Handler) Accept(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	if err := h.service.Accept(r.Context(), id, userID); err != nil {
+	if err := h.manager.Accept(r.Context(), id, userID); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
@@ -146,7 +146,7 @@ func (h *Handler) Reject(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	if err := h.service.Reject(r.Context(), id, userID); err != nil {
+	if err := h.manager.Reject(r.Context(), id, userID); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
@@ -166,7 +166,7 @@ func (h *Handler) Complete(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	if err := h.service.Complete(r.Context(), id, userID); err != nil {
+	if err := h.manager.Complete(r.Context(), id, userID); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
@@ -186,7 +186,7 @@ func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	if err := h.service.Cancel(r.Context(), id, userID); err != nil {
+	if err := h.manager.Cancel(r.Context(), id, userID); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}

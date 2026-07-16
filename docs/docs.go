@@ -338,7 +338,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/offer.Offer"
+                            "$ref": "#/definitions/service.Offer"
                         }
                     }
                 ],
@@ -346,7 +346,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/offer.Offer"
+                            "$ref": "#/definitions/service.Offer"
                         }
                     },
                     "400": {
@@ -388,7 +388,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/offer.Offer"
+                            "$ref": "#/definitions/service.Offer"
                         }
                     },
                     "404": {
@@ -772,7 +772,34 @@ const docTemplate = `{
                 }
             }
         },
-        "offer.Offer": {
+        "review.Review": {
+            "type": "object",
+            "properties": {
+                "author_id": {
+                    "type": "integer"
+                },
+                "commentaire": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "exchange_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "note": {
+                    "description": "1-5",
+                    "type": "integer"
+                },
+                "target_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.Offer": {
             "type": "object",
             "properties": {
                 "actif": {
@@ -804,33 +831,6 @@ const docTemplate = `{
                 },
                 "ville": {
                     "type": "string"
-                }
-            }
-        },
-        "review.Review": {
-            "type": "object",
-            "properties": {
-                "author_id": {
-                    "type": "integer"
-                },
-                "commentaire": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "exchange_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "note": {
-                    "description": "1-5",
-                    "type": "integer"
-                },
-                "target_id": {
-                    "type": "integer"
                 }
             }
         },

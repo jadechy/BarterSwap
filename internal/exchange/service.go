@@ -6,12 +6,12 @@ import (
 
 	"github.com/jadechy/barterswap/internal/apperrors"
 	"github.com/jadechy/barterswap/internal/dbx"
-	"github.com/jadechy/barterswap/internal/offer"
+	"github.com/jadechy/barterswap/internal/service"
 	"github.com/jadechy/barterswap/internal/user"
 )
 
 type OfferGetter interface {
-	GetByID(ctx context.Context, id int) (offer.Offer, error)
+	GetByID(ctx context.Context, id int) (service.Service, error)
 }
 
 type UserGetter interface {
@@ -22,7 +22,7 @@ type CreditLedger interface {
 	AddCreditTransaction(ctx context.Context, q dbx.Querier, userID int, exchangeID *int, montant int, typ string) error
 }
 
-type Service struct {
+type Manager struct {
 	repo      Repository
 	txManager dbx.TxRunner
 	offers    OfferGetter
@@ -30,11 +30,11 @@ type Service struct {
 	credits   CreditLedger
 }
 
-func NewService(repo Repository, txManager dbx.TxRunner, offers OfferGetter, users UserGetter, credits CreditLedger) *Service {
-	return &Service{repo: repo, txManager: txManager, offers: offers, users: users, credits: credits}
+func NewService(repo Repository, txManager dbx.TxRunner, offers OfferGetter, users UserGetter, credits CreditLedger) *Manager {
+	return &Manager{repo: repo, txManager: txManager, offers: offers, users: users, credits: credits}
 }
 
-func (s *Service) Create(ctx context.Context, requesterID, offerID int) (Exchange, error) {
+func (s *Manager) Create(ctx context.Context, requesterID, offerID int) (Exchange, error) {
 	var e Exchange
 
 	o, err := s.offers.GetByID(ctx, offerID)
@@ -71,15 +71,15 @@ func (s *Service) Create(ctx context.Context, requesterID, offerID int) (Exchang
 	return e, err
 }
 
-func (s *Service) GetByID(ctx context.Context, id int) (Exchange, error) {
+func (s *Manager) GetByID(ctx context.Context, id int) (Exchange, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *Service) List(ctx context.Context, userID int, status string) ([]Exchange, error) {
+func (s *Manager) List(ctx context.Context, userID int, status string) ([]Exchange, error) {
 	return s.repo.List(ctx, userID, status)
 }
 
-func (s *Service) Accept(ctx context.Context, exchangeID, userID int) error {
+func (s *Manager) Accept(ctx context.Context, exchangeID, userID int) error {
 	e, err := s.repo.GetByID(ctx, exchangeID)
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (s *Service) Accept(ctx context.Context, exchangeID, userID int) error {
 	})
 }
 
-func (s *Service) Reject(ctx context.Context, exchangeID, userID int) error {
+func (s *Manager) Reject(ctx context.Context, exchangeID, userID int) error {
 	e, err := s.repo.GetByID(ctx, exchangeID)
 	if err != nil {
 		return err
@@ -121,7 +121,7 @@ func (s *Service) Reject(ctx context.Context, exchangeID, userID int) error {
 	})
 }
 
-func (s *Service) Complete(ctx context.Context, exchangeID, userID int) error {
+func (s *Manager) Complete(ctx context.Context, exchangeID, userID int) error {
 	e, err := s.repo.GetByID(ctx, exchangeID)
 	if err != nil {
 		return err
@@ -146,7 +146,7 @@ func (s *Service) Complete(ctx context.Context, exchangeID, userID int) error {
 	})
 }
 
-func (s *Service) Cancel(ctx context.Context, exchangeID, userID int) error {
+func (s *Manager) Cancel(ctx context.Context, exchangeID, userID int) error {
 	e, err := s.repo.GetByID(ctx, exchangeID)
 	if err != nil {
 		return err

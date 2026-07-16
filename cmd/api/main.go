@@ -9,8 +9,8 @@ import (
 	"github.com/jadechy/barterswap/internal/dbx"
 	"github.com/jadechy/barterswap/internal/exchange"
 	"github.com/jadechy/barterswap/internal/httpserver"
-	"github.com/jadechy/barterswap/internal/offer"
 	"github.com/jadechy/barterswap/internal/review"
+	"github.com/jadechy/barterswap/internal/service"
 	"github.com/jadechy/barterswap/internal/user"
 )
 
@@ -39,12 +39,12 @@ func main() {
 	userService := user.NewService(userRepo)
 	userHandler := user.NewHandler(userService)
 
-	offerRepo := offer.NewRepository(db)
-	offerService := offer.NewService(offerRepo, userRepo)
-	offerHandler := offer.NewHandler(offerService)
+	serviceRepo := service.NewRepository(db)
+	serviceService := service.NewService(serviceRepo, userRepo)
+	serviceHandler := service.NewHandler(serviceService)
 
 	exchangeRepo := exchange.NewRepository(db)
-	exchangeService := exchange.NewService(exchangeRepo, txManager, offerRepo, userRepo, userRepo)
+	exchangeService := exchange.NewService(exchangeRepo, txManager, serviceRepo, userRepo, userRepo)
 	exchangeHandler := exchange.NewHandler(exchangeService)
 
 	reviewRepo := review.NewRepository(db)
@@ -53,7 +53,7 @@ func main() {
 
 	mux := httpserver.NewRouter(httpserver.Handlers{
 		User:     userHandler,
-		Offer:    offerHandler,
+		Service:  serviceHandler,
 		Exchange: exchangeHandler,
 		Review:   reviewHandler,
 	})

@@ -1,4 +1,4 @@
-package offer_test
+package service_test
 
 import (
 	"context"
@@ -8,13 +8,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/jadechy/barterswap/internal/apperrors"
-	"github.com/jadechy/barterswap/internal/offer"
+	"github.com/jadechy/barterswap/internal/service"
 )
 
-func newTestRepo(t *testing.T) (offer.Repository, sqlmock.Sqlmock, func()) {
+func newTestRepo(t *testing.T) (service.Repository, sqlmock.Sqlmock, func()) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
-	repo := offer.NewRepository(db)
+	repo := service.NewRepository(db)
 	return repo, mock, func() { db.Close() }
 }
 
@@ -81,7 +81,7 @@ func TestRepository_Create(t *testing.T) {
 		WithArgs(1, "Cours de piano", "Description", "Musique", 60, 5, "Paris").
 		WillReturnResult(sqlmock.NewResult(10, 1))
 
-	o := &offer.Offer{
+	o := &service.Service{
 		ProviderID: 1, Titre: "Cours de piano", Description: "Description",
 		Categorie: "Musique", DureeMinutes: 60, Credits: 5, Ville: "Paris",
 	}

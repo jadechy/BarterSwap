@@ -2,7 +2,7 @@ dir: "{{.InterfaceDir}}/mocks"
 filename: "{{.InterfaceName}}.go"
 pkgname: "{{.SrcPackageName}}mocks"
 packages:
-  github.com/jadechy/barterswap/internal/offer:
+  github.com/jadechy/barterswap/internal/service:
     interfaces:
       Repository:
   github.com/jadechy/barterswap/internal/user:

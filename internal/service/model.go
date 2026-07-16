@@ -1,6 +1,6 @@
-package offer
+package service
 
-type Offer struct {
+type Service struct {
 	ID           int    `json:"id"`
 	ProviderID   int    `json:"provider_id"`
 	Titre        string `json:"titre"`

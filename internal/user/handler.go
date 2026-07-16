@@ -9,11 +9,11 @@ import (
 )
 
 type Handler struct {
-	service *Service
+	manager *Manager
 }
 
-func NewHandler(service *Service) *Handler {
-	return &Handler{service: service}
+func NewHandler(manager *Manager) *Handler {
+	return &Handler{manager: manager}
 }
 
 // Create godoc
@@ -32,7 +32,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
 		return
 	}
-	if err := h.service.Create(r.Context(), &u); err != nil {
+	if err := h.manager.Create(r.Context(), &u); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
@@ -54,7 +54,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
 		return
 	}
-	u, err := h.service.GetByID(r.Context(), id)
+	u, err := h.manager.GetByID(r.Context(), id)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -84,7 +84,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
 		return
 	}
-	if err := h.service.Update(r.Context(), id, &u); err != nil {
+	if err := h.manager.Update(r.Context(), id, &u); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
@@ -105,7 +105,7 @@ func (h *Handler) GetSkills(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
 		return
 	}
-	skills, err := h.service.GetSkills(r.Context(), id)
+	skills, err := h.manager.GetSkills(r.Context(), id)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -135,7 +135,7 @@ func (h *Handler) SetSkills(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON invalide"})
 		return
 	}
-	if err := h.service.SetSkills(r.Context(), id, skills); err != nil {
+	if err := h.manager.SetSkills(r.Context(), id, skills); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
@@ -156,7 +156,7 @@ func (h *Handler) GetStats(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
 		return
 	}
-	stats, err := h.service.Stats(r.Context(), id)
+	stats, err := h.manager.Stats(r.Context(), id)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
