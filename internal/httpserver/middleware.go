@@ -4,7 +4,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
+
+	"github.com/jadechy/barterswap/internal/httpx"
 )
 
 // Logging journalise chaque requête HTTP.
@@ -45,18 +46,13 @@ func CORS(next http.Handler) http.Handler {
 // Auth vérifie la présence et la validité du header X-UserID.
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/swagger/") {
-			next.ServeHTTP(w, r)
-			return
-		}
-
 		userIDStr := r.Header.Get("X-UserID")
 		if userIDStr == "" {
-			http.Error(w, "header X-UserID manquant", http.StatusUnauthorized)
+			httpx.WriteJSON(w, http.StatusUnauthorized, map[string]string{"error": "header X-UserID manquant"})
 			return
 		}
 		if _, err := strconv.Atoi(userIDStr); err != nil {
-			http.Error(w, "X-UserID invalide", http.StatusBadRequest)
+			httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "X-UserID invalide"})
 			return
 		}
 		next.ServeHTTP(w, r)

@@ -18,7 +18,7 @@ func NewService(repo Repository) *Service {
 
 func (s *Service) Create(ctx context.Context, u *User) error {
 	if strings.TrimSpace(u.Pseudo) == "" {
-		return fmt.Errorf("le pseudo est requis: %w", apperrors.ErrValidation)
+		return apperrors.ValidationError{Champ: "pseudo", Message: "le pseudo est requis"}
 	}
 	return s.repo.Create(ctx, u)
 }
@@ -29,7 +29,7 @@ func (s *Service) GetByID(ctx context.Context, id int) (User, error) {
 
 func (s *Service) Update(ctx context.Context, id int, u *User) error {
 	if strings.TrimSpace(u.Pseudo) == "" {
-		return fmt.Errorf("le pseudo est requis: %w", apperrors.ErrValidation)
+		return apperrors.ValidationError{Champ: "pseudo", Message: "le pseudo est requis"}
 	}
 	return s.repo.Update(ctx, id, u)
 }
@@ -41,10 +41,13 @@ func (s *Service) GetSkills(ctx context.Context, userID int) ([]Skill, error) {
 func (s *Service) SetSkills(ctx context.Context, userID int, skills []Skill) error {
 	for _, sk := range skills {
 		if !contains(NiveauxValides, sk.Niveau) {
-			return fmt.Errorf("niveau invalide %q: %w", sk.Niveau, apperrors.ErrValidation)
+			return apperrors.ValidationError{
+				Champ:   "niveau",
+				Message: fmt.Sprintf("niveau invalide %q", sk.Niveau),
+			}
 		}
 		if strings.TrimSpace(sk.Nom) == "" {
-			return fmt.Errorf("le nom de la compétence est requis: %w", apperrors.ErrValidation)
+			return apperrors.ValidationError{Champ: "nom", Message: "le nom de la compétence est requis"}
 		}
 	}
 	return s.repo.SetSkills(ctx, userID, skills)
