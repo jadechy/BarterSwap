@@ -1,4 +1,4 @@
-package main
+package httpserver
 
 import (
 	"log"
@@ -6,16 +6,16 @@ import (
 	"strconv"
 )
 
-// loggingMiddleware log chaque requête HTTP
-func loggingMiddleware(next http.Handler) http.Handler {
+// Logging journalise chaque requête HTTP.
+func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s", r.Method, r.URL.Path)
 		next.ServeHTTP(w, r)
 	})
 }
 
-// recoveryMiddleware récupère les panics et renvoie un 500
-func recoveryMiddleware(next http.Handler) http.Handler {
+// Recovery récupère les panics et renvoie un 500 plutôt que de faire crasher le serveur.
+func Recovery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
@@ -27,8 +27,8 @@ func recoveryMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// corsMiddleware ajoute les headers CORS
-func corsMiddleware(next http.Handler) http.Handler {
+// CORS ajoute les headers nécessaires aux requêtes cross-origin.
+func CORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
@@ -41,16 +41,15 @@ func corsMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// authMiddleware vérifie la présence du header X-UserID
-func authMiddleware(next http.Handler) http.Handler {
+// Auth vérifie la présence et la validité du header X-UserID.
+func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userIDStr := r.Header.Get("X-UserID")
 		if userIDStr == "" {
 			http.Error(w, "header X-UserID manquant", http.StatusUnauthorized)
 			return
 		}
-		_, err := strconv.Atoi(userIDStr)
-		if err != nil {
+		if _, err := strconv.Atoi(userIDStr); err != nil {
 			http.Error(w, "X-UserID invalide", http.StatusBadRequest)
 			return
 		}
@@ -58,11 +57,11 @@ func authMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// applyMiddlewares chaîne tous les middlewares
-func applyMiddlewares(h http.Handler) http.Handler {
-	h = authMiddleware(h)
-	h = corsMiddleware(h)
-	h = recoveryMiddleware(h)
-	h = loggingMiddleware(h)
+// ApplyMiddlewares chaîne tous les middlewares dans l'ordre d'exécution souhaité.
+func ApplyMiddlewares(h http.Handler) http.Handler {
+	h = Auth(h)
+	h = CORS(h)
+	h = Recovery(h)
+	h = Logging(h)
 	return h
 }
