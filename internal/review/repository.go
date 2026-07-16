@@ -30,7 +30,10 @@ func (r *sqlRepository) Create(ctx context.Context, rev *Review) error {
 	if err != nil {
 		return fmt.Errorf("review.Create: %w", err)
 	}
-	id, _ := result.LastInsertId()
+	id, err := result.LastInsertId()
+	if err != nil {
+		return fmt.Errorf("review.Create lastInsertId: %w", err)
+	}
 	rev.ID = int(id)
 	return nil
 }
