@@ -14,7 +14,7 @@ import (
 	"github.com/jadechy/barterswap/internal/user"
 )
 
-// @title           Armali Troc API
+// @title           Barterswap
 // @version         1.0
 // @description     API de troc de services entre particuliers, basé sur des crédits-temps.
 // @host            localhost:8080
