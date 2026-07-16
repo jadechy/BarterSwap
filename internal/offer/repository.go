@@ -35,7 +35,7 @@ func (r *sqlRepository) GetByID(ctx context.Context, id int) (Offer, error) {
 	err := row.Scan(&o.ID, &o.ProviderID, &o.Titre, &o.Description,
 		&o.Categorie, &o.DureeMinutes, &o.Credits, &o.Ville, &o.Actif, &o.CreatedAt)
 	if err == sql.ErrNoRows {
-		return o, apperrors.ErrNotFound
+		return o, fmt.Errorf("offre %d introuvable: %w", id, apperrors.ErrNotFound)
 	}
 	if err != nil {
 		return o, fmt.Errorf("offer.GetByID: %w", err)

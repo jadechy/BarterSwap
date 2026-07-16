@@ -37,7 +37,8 @@ func (r *sqlRepository) GetByID(ctx context.Context, id int) (Exchange, error) {
 	err := row.Scan(&e.ID, &e.ServiceID, &e.RequesterID, &e.OwnerID,
 		&e.Status, &e.CreatedAt, &e.UpdatedAt)
 	if err == sql.ErrNoRows {
-		return e, apperrors.ErrNotFound
+		return e, fmt.Errorf("exchange %d introuvable: %w", id, apperrors.ErrNotFound)
+
 	}
 	if err != nil {
 		return e, fmt.Errorf("exchange.GetByID: %w", err)
