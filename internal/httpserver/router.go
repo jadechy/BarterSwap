@@ -3,6 +3,9 @@ package httpserver
 import (
 	"net/http"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	_ "github.com/jadechy/barterswap/docs"
 	exchangehttp "github.com/jadechy/barterswap/internal/exchange"
 	offerhttp "github.com/jadechy/barterswap/internal/offer"
 	reviewhttp "github.com/jadechy/barterswap/internal/review"
@@ -49,6 +52,8 @@ func NewRouter(h Handlers) *http.ServeMux {
 	mux.HandleFunc("PUT /api/exchanges/{id}/complete", h.Exchange.Complete)
 	mux.HandleFunc("PUT /api/exchanges/{id}/cancel", h.Exchange.Cancel)
 	mux.HandleFunc("POST /api/exchanges/{id}/review", h.Review.Create)
+
+	mux.Handle("GET /swagger/", httpSwagger.WrapHandler)
 
 	return mux
 }
