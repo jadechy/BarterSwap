@@ -7,8 +7,8 @@ import (
 
 	_ "github.com/jadechy/barterswap/docs"
 	exchangehttp "github.com/jadechy/barterswap/internal/exchange"
-	offerhttp "github.com/jadechy/barterswap/internal/offer"
 	reviewhttp "github.com/jadechy/barterswap/internal/review"
+	servicehttp "github.com/jadechy/barterswap/internal/service"
 	userhttp "github.com/jadechy/barterswap/internal/user"
 )
 
@@ -17,7 +17,7 @@ import (
 // devient source d'erreur à mesure que le nombre de domaines grandit.
 type Handlers struct {
 	User     *userhttp.Handler
-	Offer    *offerhttp.Handler
+	Service  *servicehttp.Handler
 	Exchange *exchangehttp.Handler
 	Review   *reviewhttp.Handler
 }
@@ -36,8 +36,8 @@ func NewRouter(h Handlers) *http.ServeMux {
 
 	// --- Offers  ---
 	// mux.HandleFunc("GET /api/services", h.Offer.List)
-	mux.HandleFunc("POST /api/services", h.Offer.Create)
-	mux.HandleFunc("GET /api/services/{id}", h.Offer.GetByID)
+	mux.HandleFunc("POST /api/services", h.Service.Create)
+	mux.HandleFunc("GET /api/services/{id}", h.Service.GetByID)
 	// mux.HandleFunc("PUT /api/services/{id}", h.Offer.Update)
 	// mux.HandleFunc("DELETE /api/services/{id}", h.Offer.Delete)
 	mux.HandleFunc("GET /api/services/{id}/reviews", h.Review.GetByServiceID)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/jadechy/barterswap/internal/apperrors"
 	"github.com/jadechy/barterswap/internal/dbx"
@@ -36,7 +37,8 @@ func (r *sqlRepository) GetByID(ctx context.Context, id int) (Exchange, error) {
 	err := row.Scan(&e.ID, &e.ServiceID, &e.RequesterID, &e.OwnerID,
 		&e.Status, &e.CreatedAt, &e.UpdatedAt)
 	if err == sql.ErrNoRows {
-		return e, apperrors.ErrNotFound
+		return e, fmt.Errorf("exchange %d: %w", id, apperrors.ErrNotFound)
+
 	}
 	if err != nil {
 		return e, fmt.Errorf("exchange.GetByID: %w", err)
@@ -58,7 +60,11 @@ func (r *sqlRepository) List(ctx context.Context, userID int, status string) ([]
 	if err != nil {
 		return nil, fmt.Errorf("exchange.List: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); cerr != nil {
+			log.Printf("exchange.List: erreur fermeture rows: %v", cerr)
+		}
+	}()
 
 	var exchanges []Exchange
 	for rows.Next() {
@@ -68,6 +74,9 @@ func (r *sqlRepository) List(ctx context.Context, userID int, status string) ([]
 			return nil, fmt.Errorf("exchange.List scan: %w", err)
 		}
 		exchanges = append(exchanges, e)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("exchange.List rows: %w", err)
 	}
 	return exchanges, nil
 }
@@ -101,9 +110,12 @@ func (r *sqlRepository) UpdateStatus(ctx context.Context, q dbx.Querier, id int,
 	if err != nil {
 		return fmt.Errorf("exchange.UpdateStatus: %w", err)
 	}
-	rows, _ := result.RowsAffected()
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("exchange.UpdateStatus rowsAffected: %w", err)
+	}
 	if rows == 0 {
-		return apperrors.ErrNotFound
+		return fmt.Errorf("échange %d: %w", id, apperrors.ErrNotFound)
 	}
 	return nil
 }

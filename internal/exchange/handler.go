@@ -10,11 +10,11 @@ import (
 )
 
 type Handler struct {
-	service *Service
+	manager *Manager
 }
 
-func NewHandler(service *Service) *Handler {
-	return &Handler{service: service}
+func NewHandler(manager *Manager) *Handler {
+	return &Handler{manager: manager}
 }
 
 func currentUserID(r *http.Request) (int, error) {
@@ -57,7 +57,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	e, err := h.service.Create(r.Context(), userID, body.ServiceID)
+	e, err := h.manager.Create(r.Context(), userID, body.ServiceID)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -66,6 +66,14 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusCreated, e)
 }
 
+// List godoc
+// @Summary      Lister mes échanges
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        status query string false "Filtrer par statut"
+// @Success      200 {array} Exchange
+// @Router       /exchanges [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	userID, err := currentUserID(r)
 	if err != nil {
@@ -74,7 +82,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	}
 	status := r.URL.Query().Get("status")
 
-	exchanges, err := h.service.List(r.Context(), userID, status)
+	exchanges, err := h.manager.List(r.Context(), userID, status)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -82,13 +90,22 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, exchanges)
 }
 
+// GetByID godoc
+// @Summary      Récupérer un échange par ID
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        id path int true "ID échange"
+// @Success      200 {object} Exchange
+// @Failure      404 {object} map[string]string
+// @Router       /exchanges/{id} [get]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
 		return
 	}
-	e, err := h.service.GetByID(r.Context(), id)
+	e, err := h.manager.GetByID(r.Context(), id)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -109,46 +126,67 @@ func (h *Handler) Accept(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	if err := h.service.Accept(r.Context(), id, userID); err != nil {
+	if err := h.manager.Accept(r.Context(), id, userID); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange accepté"})
 }
 
+// Reject godoc
+// @Summary      Refuser un échange
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Param        id path int true "ID échange"
+// @Success      200 {object} map[string]string
+// @Router       /exchanges/{id}/reject [put]
 func (h *Handler) Reject(w http.ResponseWriter, r *http.Request) {
 	id, userID, err := parseAction(r)
 	if err != nil {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	if err := h.service.Reject(r.Context(), id, userID); err != nil {
+	if err := h.manager.Reject(r.Context(), id, userID); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange refusé"})
 }
 
+// Complete godoc
+// @Summary      Terminer un échange accepté
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Param        id path int true "ID échange"
+// @Success      200 {object} map[string]string
+// @Router       /exchanges/{id}/complete [put]
 func (h *Handler) Complete(w http.ResponseWriter, r *http.Request) {
 	id, userID, err := parseAction(r)
 	if err != nil {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	if err := h.service.Complete(r.Context(), id, userID); err != nil {
+	if err := h.manager.Complete(r.Context(), id, userID); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange terminé"})
 }
 
+// Cancel godoc
+// @Summary      Annuler un échange
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Param        id path int true "ID échange"
+// @Success      200 {object} map[string]string
+// @Router       /exchanges/{id}/cancel [put]
 func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) {
 	id, userID, err := parseAction(r)
 	if err != nil {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	if err := h.service.Cancel(r.Context(), id, userID); err != nil {
+	if err := h.manager.Cancel(r.Context(), id, userID); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}

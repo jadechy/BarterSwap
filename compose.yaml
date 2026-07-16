@@ -11,15 +11,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - .env.dev
 
   db:
     image: mysql:8.0
     platform: linux/x86_64
     restart: unless-stopped
-    env_file:
-      - .env.dev
     volumes:
       - db-data:/var/lib/mysql
     ports:
@@ -44,8 +40,6 @@ services:
     image: phpmyadmin/phpmyadmin
     ports:
       - "8081:80"
-    env_file:
-      - .env.dev
     depends_on:
       - db
 

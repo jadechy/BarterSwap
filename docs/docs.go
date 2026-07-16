@@ -16,6 +16,39 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/exchanges": {
+            "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Lister mes échanges",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrer par statut",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/exchange.Exchange"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -53,6 +86,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/exchanges/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Récupérer un échange par ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID échange",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/exchange.Exchange"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/exchanges/{id}/accept": {
             "put": {
                 "security": [
@@ -64,6 +139,105 @@ const docTemplate = `{
                     "exchanges"
                 ],
                 "summary": "Accepter un échange",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID échange",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exchanges/{id}/cancel": {
+            "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Annuler un échange",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID échange",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exchanges/{id}/complete": {
+            "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Terminer un échange accepté",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID échange",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exchanges/{id}/reject": {
+            "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Refuser un échange",
                 "parameters": [
                     {
                         "type": "integer",
@@ -164,7 +338,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/offer.Offer"
+                            "$ref": "#/definitions/service.Offer"
                         }
                     }
                 ],
@@ -172,7 +346,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/offer.Offer"
+                            "$ref": "#/definitions/service.Offer"
                         }
                     },
                     "400": {
@@ -214,7 +388,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/offer.Offer"
+                            "$ref": "#/definitions/service.Offer"
                         }
                     },
                     "404": {
@@ -598,7 +772,34 @@ const docTemplate = `{
                 }
             }
         },
-        "offer.Offer": {
+        "review.Review": {
+            "type": "object",
+            "properties": {
+                "author_id": {
+                    "type": "integer"
+                },
+                "commentaire": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "exchange_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "note": {
+                    "description": "1-5",
+                    "type": "integer"
+                },
+                "target_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.Offer": {
             "type": "object",
             "properties": {
                 "actif": {
@@ -630,33 +831,6 @@ const docTemplate = `{
                 },
                 "ville": {
                     "type": "string"
-                }
-            }
-        },
-        "review.Review": {
-            "type": "object",
-            "properties": {
-                "author_id": {
-                    "type": "integer"
-                },
-                "commentaire": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "exchange_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "note": {
-                    "description": "1-5",
-                    "type": "integer"
-                },
-                "target_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -746,7 +920,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "Armali Troc API",
+	Title:            "Barterswap",
 	Description:      "API de troc de services entre particuliers, basé sur des crédits-temps.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

@@ -3,7 +3,9 @@ package dbx
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"log"
 )
 
 // Querier est satisfaite à la fois par *sql.DB et *sql.Tx —
@@ -14,7 +16,9 @@ type Querier interface {
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
 }
-
+type TxRunner interface {
+	WithTx(ctx context.Context, fn func(q Querier) error) error
+}
 type TxManager struct {
 	db *sql.DB
 }
@@ -30,7 +34,11 @@ func (tm *TxManager) WithTx(ctx context.Context, fn func(q Querier) error) error
 	if err != nil {
 		return fmt.Errorf("dbx.WithTx begin: %w", err)
 	}
-	defer tx.Rollback() // no-op si déjà commit
+	defer func() {
+		if rerr := tx.Rollback(); rerr != nil && !errors.Is(rerr, sql.ErrTxDone) {
+			log.Printf("dbx.WithTx: erreur rollback: %v", rerr)
+		}
+	}()
 
 	if err := fn(tx); err != nil {
 		return err

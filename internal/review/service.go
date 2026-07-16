@@ -15,18 +15,21 @@ type ExchangeGetter interface {
 	GetByID(ctx context.Context, id int) (exchange.Exchange, error)
 }
 
-type Service struct {
+type Manager struct {
 	repo         Repository
 	exchangeRepo ExchangeGetter
 }
 
-func NewService(repo Repository, exchangeRepo ExchangeGetter) *Service {
-	return &Service{repo: repo, exchangeRepo: exchangeRepo}
+func NewService(repo Repository, exchangeRepo ExchangeGetter) *Manager {
+	return &Manager{repo: repo, exchangeRepo: exchangeRepo}
 }
 
-func (s *Service) Create(ctx context.Context, r *Review) error {
+func (s *Manager) Create(ctx context.Context, r *Review) error {
 	if r.Note < 1 || r.Note > 5 {
-		return fmt.Errorf("la note doit être entre 1 et 5: %w", apperrors.ErrValidation)
+		return apperrors.ValidationError{
+			Champ:   "note",
+			Message: fmt.Sprintf("la note doit être entre 1 et 5, reçu : %d", r.Note),
+		}
 	}
 
 	e, err := s.exchangeRepo.GetByID(ctx, r.ExchangeID)
@@ -59,10 +62,10 @@ func (s *Service) Create(ctx context.Context, r *Review) error {
 	return s.repo.Create(ctx, r)
 }
 
-func (s *Service) GetByUserID(ctx context.Context, userID int) ([]Review, error) {
+func (s *Manager) GetByUserID(ctx context.Context, userID int) ([]Review, error) {
 	return s.repo.GetByUserID(ctx, userID)
 }
 
-func (s *Service) GetByServiceID(ctx context.Context, serviceID int) ([]Review, error) {
+func (s *Manager) GetByServiceID(ctx context.Context, serviceID int) ([]Review, error) {
 	return s.repo.GetByServiceID(ctx, serviceID)
 }

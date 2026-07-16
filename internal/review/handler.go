@@ -9,11 +9,11 @@ import (
 )
 
 type Handler struct {
-	service *Service
+	manager *Manager
 }
 
-func NewHandler(service *Service) *Handler {
-	return &Handler{service: service}
+func NewHandler(manager *Manager) *Handler {
+	return &Handler{manager: manager}
 }
 
 func currentUserID(r *http.Request) (int, error) {
@@ -60,7 +60,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		Commentaire: body.Commentaire,
 	}
 
-	if err := h.service.Create(r.Context(), &rev); err != nil {
+	if err := h.manager.Create(r.Context(), &rev); err != nil {
 		httpx.WriteError(w, err)
 		return
 	}
@@ -82,7 +82,7 @@ func (h *Handler) GetByUserID(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
 		return
 	}
-	reviews, err := h.service.GetByUserID(r.Context(), id)
+	reviews, err := h.manager.GetByUserID(r.Context(), id)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
@@ -104,7 +104,7 @@ func (h *Handler) GetByServiceID(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": "id invalide"})
 		return
 	}
-	reviews, err := h.service.GetByServiceID(r.Context(), id)
+	reviews, err := h.manager.GetByServiceID(r.Context(), id)
 	if err != nil {
 		httpx.WriteError(w, err)
 		return
