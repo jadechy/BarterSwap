@@ -35,7 +35,7 @@ func (r *sqlRepository) GetByID(ctx context.Context, id int) (Offer, error) {
 	err := row.Scan(&o.ID, &o.ProviderID, &o.Titre, &o.Description,
 		&o.Categorie, &o.DureeMinutes, &o.Credits, &o.Ville, &o.Actif, &o.CreatedAt)
 	if err == sql.ErrNoRows {
-		return o, fmt.Errorf("offre %d introuvable: %w", id, apperrors.ErrNotFound)
+		return o, fmt.Errorf("offre %d: %w", id, apperrors.ErrNotFound)
 	}
 	if err != nil {
 		return o, fmt.Errorf("offer.GetByID: %w", err)
@@ -109,9 +109,12 @@ func (r *sqlRepository) Update(ctx context.Context, id int, o *Offer) error {
 	if err != nil {
 		return fmt.Errorf("offer.Update: %w", err)
 	}
-	rows, _ := result.RowsAffected()
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("offer.Update rowsAffected: %w", err)
+	}
 	if rows == 0 {
-		return apperrors.ErrNotFound
+		return fmt.Errorf("service %d: %w", id, apperrors.ErrNotFound)
 	}
 	return nil
 }
@@ -121,9 +124,12 @@ func (r *sqlRepository) Delete(ctx context.Context, id int) error {
 	if err != nil {
 		return fmt.Errorf("offer.Delete: %w", err)
 	}
-	rows, _ := result.RowsAffected()
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("offer.Delete rowsAffected: %w", err)
+	}
 	if rows == 0 {
-		return apperrors.ErrNotFound
+		return fmt.Errorf("service %d: %w", id, apperrors.ErrNotFound)
 	}
 	return nil
 }

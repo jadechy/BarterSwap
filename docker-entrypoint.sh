@@ -5,8 +5,8 @@ MARKER=".db-initialized"
 
 if [ ! -f "$MARKER" ]; then
     echo "Première initialisation : application du schéma et des seeds..."
-    mysql -h db -u go -ppassword barterswap < schema.sql
-    mysql -h db -u go -ppassword barterswap < seeds.sql
+    mysql --skip-ssl -h db -u go -ppassword barterswap < schema.sql
+    mysql --skip-ssl -h db -u go -ppassword barterswap < seeds.sql
     touch "$MARKER"
     echo "Base initialisée."
 else

@@ -37,7 +37,7 @@ func (r *sqlRepository) GetByID(ctx context.Context, id int) (Exchange, error) {
 	err := row.Scan(&e.ID, &e.ServiceID, &e.RequesterID, &e.OwnerID,
 		&e.Status, &e.CreatedAt, &e.UpdatedAt)
 	if err == sql.ErrNoRows {
-		return e, fmt.Errorf("exchange %d introuvable: %w", id, apperrors.ErrNotFound)
+		return e, fmt.Errorf("exchange %d: %w", id, apperrors.ErrNotFound)
 
 	}
 	if err != nil {
@@ -110,9 +110,12 @@ func (r *sqlRepository) UpdateStatus(ctx context.Context, q dbx.Querier, id int,
 	if err != nil {
 		return fmt.Errorf("exchange.UpdateStatus: %w", err)
 	}
-	rows, _ := result.RowsAffected()
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("exchange.UpdateStatus rowsAffected: %w", err)
+	}
 	if rows == 0 {
-		return apperrors.ErrNotFound
+		return fmt.Errorf("échange %d: %w", id, apperrors.ErrNotFound)
 	}
 	return nil
 }

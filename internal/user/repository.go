@@ -39,7 +39,7 @@ func (r *sqlRepository) GetByID(ctx context.Context, id int) (User, error) {
 
 	err := row.Scan(&u.ID, &u.Pseudo, &u.Bio, &u.Ville, &u.CreditBalance, &u.CreatedAt)
 	if err == sql.ErrNoRows {
-		return u, fmt.Errorf("utilisateur %d introuvable: %w", id, apperrors.ErrNotFound)
+		return u, fmt.Errorf("utilisateur %d: %w", id, apperrors.ErrNotFound)
 	}
 	if err != nil {
 		return u, fmt.Errorf("user.GetByID: %w", err)
@@ -100,7 +100,7 @@ func (r *sqlRepository) Update(ctx context.Context, id int, u *User) error {
 		return fmt.Errorf("user.Update rowsAffected: %w", err)
 	}
 	if rows == 0 {
-		return apperrors.ErrNotFound
+		return fmt.Errorf("utilisateur %d: %w", id, apperrors.ErrNotFound)
 	}
 	return nil
 }
