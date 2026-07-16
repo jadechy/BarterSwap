@@ -109,10 +109,30 @@ host: localhost:8080
 info:
   contact: {}
   description: API de troc de services entre particuliers, basé sur des crédits-temps.
-  title: Armali Troc API
+  title: Barterswap
   version: "1.0"
 paths:
   /exchanges:
+    get:
+      parameters:
+      - description: Filtrer par statut
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/exchange.Exchange'
+            type: array
+      security:
+      - UserIDAuth: []
+      summary: Lister mes échanges
+      tags:
+      - exchanges
     post:
       consumes:
       - application/json
@@ -135,6 +155,32 @@ paths:
       summary: Créer une demande d'échange
       tags:
       - exchanges
+  /exchanges/{id}:
+    get:
+      parameters:
+      - description: ID échange
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/exchange.Exchange'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Récupérer un échange par ID
+      tags:
+      - exchanges
   /exchanges/{id}/accept:
     put:
       parameters:
@@ -153,6 +199,66 @@ paths:
       security:
       - UserIDAuth: []
       summary: Accepter un échange
+      tags:
+      - exchanges
+  /exchanges/{id}/cancel:
+    put:
+      parameters:
+      - description: ID échange
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Annuler un échange
+      tags:
+      - exchanges
+  /exchanges/{id}/complete:
+    put:
+      parameters:
+      - description: ID échange
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Terminer un échange accepté
+      tags:
+      - exchanges
+  /exchanges/{id}/reject:
+    put:
+      parameters:
+      - description: ID échange
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - UserIDAuth: []
+      summary: Refuser un échange
       tags:
       - exchanges
   /exchanges/{id}/review:

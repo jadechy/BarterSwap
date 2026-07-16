@@ -66,6 +66,14 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusCreated, e)
 }
 
+// List godoc
+// @Summary      Lister mes échanges
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        status query string false "Filtrer par statut"
+// @Success      200 {array} Exchange
+// @Router       /exchanges [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	userID, err := currentUserID(r)
 	if err != nil {
@@ -82,6 +90,15 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, exchanges)
 }
 
+// GetByID godoc
+// @Summary      Récupérer un échange par ID
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Produce      json
+// @Param        id path int true "ID échange"
+// @Success      200 {object} Exchange
+// @Failure      404 {object} map[string]string
+// @Router       /exchanges/{id} [get]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -116,6 +133,13 @@ func (h *Handler) Accept(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange accepté"})
 }
 
+// Reject godoc
+// @Summary      Refuser un échange
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Param        id path int true "ID échange"
+// @Success      200 {object} map[string]string
+// @Router       /exchanges/{id}/reject [put]
 func (h *Handler) Reject(w http.ResponseWriter, r *http.Request) {
 	id, userID, err := parseAction(r)
 	if err != nil {
@@ -129,6 +153,13 @@ func (h *Handler) Reject(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange refusé"})
 }
 
+// Complete godoc
+// @Summary      Terminer un échange accepté
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Param        id path int true "ID échange"
+// @Success      200 {object} map[string]string
+// @Router       /exchanges/{id}/complete [put]
 func (h *Handler) Complete(w http.ResponseWriter, r *http.Request) {
 	id, userID, err := parseAction(r)
 	if err != nil {
@@ -142,6 +173,13 @@ func (h *Handler) Complete(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"message": "échange terminé"})
 }
 
+// Cancel godoc
+// @Summary      Annuler un échange
+// @Tags         exchanges
+// @Security     UserIDAuth
+// @Param        id path int true "ID échange"
+// @Success      200 {object} map[string]string
+// @Router       /exchanges/{id}/cancel [put]
 func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) {
 	id, userID, err := parseAction(r)
 	if err != nil {

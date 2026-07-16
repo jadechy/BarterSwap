@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "API de troc de services entre particuliers, basé sur des crédits-temps.",
-        "title": "Armali Troc API",
+        "title": "Barterswap",
         "contact": {},
         "version": "1.0"
     },
@@ -10,6 +10,39 @@
     "basePath": "/api",
     "paths": {
         "/exchanges": {
+            "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Lister mes échanges",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrer par statut",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/exchange.Exchange"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -47,6 +80,48 @@
                 }
             }
         },
+        "/exchanges/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Récupérer un échange par ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID échange",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/exchange.Exchange"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/exchanges/{id}/accept": {
             "put": {
                 "security": [
@@ -58,6 +133,105 @@
                     "exchanges"
                 ],
                 "summary": "Accepter un échange",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID échange",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exchanges/{id}/cancel": {
+            "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Annuler un échange",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID échange",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exchanges/{id}/complete": {
+            "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Terminer un échange accepté",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID échange",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exchanges/{id}/reject": {
+            "put": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "tags": [
+                    "exchanges"
+                ],
+                "summary": "Refuser un échange",
                 "parameters": [
                     {
                         "type": "integer",
