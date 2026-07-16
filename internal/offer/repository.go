@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/jadechy/barterswap/internal/apperrors"
 )
@@ -65,7 +66,11 @@ func (r *sqlRepository) List(ctx context.Context, f ListFilter) ([]Offer, error)
 	if err != nil {
 		return nil, fmt.Errorf("offer.List: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); cerr != nil {
+			log.Printf("offer.List: erreur fermeture rows: %v", cerr)
+		}
+	}()
 
 	var offers []Offer
 	for rows.Next() {
@@ -75,6 +80,9 @@ func (r *sqlRepository) List(ctx context.Context, f ListFilter) ([]Offer, error)
 			return nil, fmt.Errorf("offer.List scan: %w", err)
 		}
 		offers = append(offers, o)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("offer.List rows: %w", err)
 	}
 	return offers, nil
 }

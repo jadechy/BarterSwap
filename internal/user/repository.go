@@ -3,7 +3,9 @@ package user
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"log"
 
 	"github.com/jadechy/barterswap/internal/apperrors"
 	"github.com/jadechy/barterswap/internal/dbx"
@@ -57,7 +59,11 @@ func (r *sqlRepository) Create(ctx context.Context, u *User) error {
 	if err != nil {
 		return fmt.Errorf("user.Create begin: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if rerr := tx.Rollback(); rerr != nil && !errors.Is(rerr, sql.ErrTxDone) {
+			log.Printf("user.Create: erreur rollback: %v", rerr)
+		}
+	}()
 
 	result, err := tx.ExecContext(ctx, `
 		INSERT INTO users (pseudo, bio, ville, credit_balance)
@@ -102,7 +108,11 @@ func (r *sqlRepository) GetSkills(ctx context.Context, userID int) ([]Skill, err
 	if err != nil {
 		return nil, fmt.Errorf("user.GetSkills: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); cerr != nil {
+			log.Printf("user.GetSkills: erreur fermeture rows: %v", cerr)
+		}
+	}()
 
 	var skills []Skill
 	for rows.Next() {
@@ -112,15 +122,21 @@ func (r *sqlRepository) GetSkills(ctx context.Context, userID int) ([]Skill, err
 		}
 		skills = append(skills, s)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("user.GetSkills rows: %w", err)
+	}
 	return skills, nil
 }
-
 func (r *sqlRepository) SetSkills(ctx context.Context, userID int, skills []Skill) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("user.SetSkills begin: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if rerr := tx.Rollback(); rerr != nil && !errors.Is(rerr, sql.ErrTxDone) {
+			log.Printf("user.SetSkills: erreur rollback: %v", rerr)
+		}
+	}()
 
 	_, err = tx.ExecContext(ctx, `DELETE FROM skills WHERE user_id = ?`, userID)
 	if err != nil {

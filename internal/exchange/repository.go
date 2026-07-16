@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/jadechy/barterswap/internal/apperrors"
 	"github.com/jadechy/barterswap/internal/dbx"
@@ -58,7 +59,11 @@ func (r *sqlRepository) List(ctx context.Context, userID int, status string) ([]
 	if err != nil {
 		return nil, fmt.Errorf("exchange.List: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cerr := rows.Close(); cerr != nil {
+			log.Printf("exchange.List: erreur fermeture rows: %v", cerr)
+		}
+	}()
 
 	var exchanges []Exchange
 	for rows.Next() {
@@ -68,6 +73,9 @@ func (r *sqlRepository) List(ctx context.Context, userID int, status string) ([]
 			return nil, fmt.Errorf("exchange.List scan: %w", err)
 		}
 		exchanges = append(exchanges, e)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("exchange.List rows: %w", err)
 	}
 	return exchanges, nil
 }
