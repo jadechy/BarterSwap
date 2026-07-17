@@ -18,7 +18,7 @@ CREATE TABLE skills (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     nom VARCHAR(100) NOT NULL,
-    niveau ENUM('débutant', 'intermédiaire', 'expert') NOT NULL,
+    niveau ENUM('debutant', 'intermediaire', 'expert') NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

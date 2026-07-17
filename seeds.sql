@@ -17,13 +17,13 @@ INSERT INTO users (id, pseudo, bio, ville, credit_balance) VALUES
 -- Compétences
 INSERT INTO skills (user_id, nom, niveau) VALUES
 (1, 'Informatique', 'expert'),
-(1, 'Tutorat', 'intermédiaire'),
+(1, 'Tutorat', 'intermediaire'),
 (2, 'Musique', 'expert'),
-(2, 'Bricolage', 'intermédiaire'),
+(2, 'Bricolage', 'intermediaire'),
 (3, 'Photographie', 'expert'),
-(3, 'Informatique', 'débutant'),
+(3, 'Informatique', 'debutant'),
 (4, 'Jardinage', 'expert'),
-(4, 'Cuisine', 'intermédiaire');
+(4, 'Cuisine', 'intermediaire');
 
 -- Services
 INSERT INTO services (id, provider_id, titre, description, categorie, duree_minutes, credits, ville, actif) VALUES
