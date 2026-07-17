@@ -302,7 +302,6 @@ Si les 4 commandes ne retournent absolument rien, le code est valide sur la comp
 ```bash
 make test        # tests détaillés (-v) avec profil de couverture
 make cover        # couverture totale agrégée
-make cover-html    # rapport HTML navigable
 ```
 
 Ou directement :
